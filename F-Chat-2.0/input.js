@@ -99,7 +99,7 @@ help = function(cmd) {
  * Local Fail function, optional callHelp_ boolean to display help notifications on certain types of opt-outs.
  *
  * @param {String} err Error message
- * @param {Boolean} [opt_callHelp] Optional display helpfile call.
+ * @param {String} [opt_callHelp] Optional display helpfile call.
  */
 fail = function (err, opt_callHelp) {
     fprint(err);
@@ -1875,26 +1875,39 @@ FList.Chat.Input.Commands.who = {
  * Display All Commands command.
  */
 FList.Chat.Input.Commands.help = {
-    func: function() {
+    func: function(args) {
         var listArr = [],
             i;
 
-        for (i in FList.Chat.Input.Commands) {
-              listArr.push(i);
+        if (args[0] && FList.Chat.Input.Commands[args[0]]) {
+            help(args[0]);
+        } else {
+
+            for (i in FList.Chat.Input.Commands) {
+                  listArr.push(i);
+            }
+
+            listArr.sort();
+
+            fprint('[b]Currently implemented commands[/b]:');
+            fprint(listArr.join(', '));
+            fprint('For more information about command descriptions, ' +
+                   'use and syntax elaboration, please refer to the command\'s individual helpfiles.' +
+                   ' Syntax: \'/command help\' or \'/help command\'.');
         }
-
-        listArr.sort();
-
-        fprint('[b]Currently implemented commands[/b]:');
-        fprint(listArr.join(', '));
-        fprint('For more information about command descriptions, ' +
-               'use and syntax elaboration, please refer to the command\'s individual helpfiles.' +
-               ' Syntax: \'/command help\'.');
 
         pass();
     },
     title: 'Help',
-    does: 'Lists all currently implemented commands to refer to with the syntax \'/command help\'.'
+    does: 'I\'m sorry, ' + FList.Chat.identity + ', I just can\'t help you anymore.',
+    params: [
+        {
+            type: 'string',
+            ID: 'Command',
+            hint: 'The command to display the helpfile for.',
+            optional: true
+        }
+    ]
 };
 
 }());
