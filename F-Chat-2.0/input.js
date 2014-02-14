@@ -51,9 +51,8 @@ curTab = FList.Chat.TabBar.activeTab,
  * @param {String} msg The string to print
  */
 fprint = function(msg) {
-    FList.Chat.printMessage(msg, curTab.type,
-                           curTab.id, 'System', 'exact',
-                           'error', false);
+    FList.Chat.printMessage(msg, curTab.type, curTab.id, 'System',
+                                         'exact', 'error', false);
 },
 
 /**
@@ -67,13 +66,12 @@ help = function(cmd) {
 
     cmd = FList.Chat.Input.Commands[cmd];
 
-    for (i = 0;i < cmd.params.length;++i) {
+    for (i = 0,ii=cmd.params.length;i < ii;++i) {
         egParms += cmd.params[i].ID.toLowerCase();
 
         if (((cmd.params[i].type === 'string' && cmd.params[i].separate) ||
             (cmd.params[i].type === 'character' && !cmd.params[i].onlineOnly)) &&
             (cmd.params.length > 1 && cmd.params.length !== (i + 1))) {
-
             egParms += ', ';
         } else {
             egParms += ' ';
