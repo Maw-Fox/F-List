@@ -825,7 +825,7 @@ FList.Chat.TabBar = new function TabBar() {
         }
     };
 
-    this.setActive = function(_type, _id){
+    this.setActive = function (_type, _id) {
 
         if(this.activeTab!==false){
             FList.Chat.TypeState.check(true);
@@ -871,7 +871,7 @@ FList.Chat.TabBar = new function TabBar() {
         FList.Chat.TypingArea.update();
         FList.Chat.Roleplay.update(_type==="channel" ? _id : "");
 
-        if (FList.Window.Notice.tabTally[_id.toLowerCase()]) {
+        if (_id.toLowerCase() in FList.Window.Notice.tabTally) {
             FList.Window.Notice.readMsg(_id.toLowerCase());
         }
 
@@ -1074,8 +1074,9 @@ FList.Chat.TabBar = new function TabBar() {
         tabEl.mousedown(function(){ FList.Chat.TabBar.setActive(_type,_id); });
         FList.Chat.TabBar.makeSortable();
     };
+
     this.closeTab = function(el){
-    var tabdata=this.getTabFromElement(el);
+        var tabdata=this.getTabFromElement(el);
         if(FList.Chat.TabBar.activeTab.type===tabdata.type && FList.Chat.TabBar.activeTab.id===tabdata.id) this.tabToTheLeft();
         if(tabdata.type==="channel") {
             var channeldata=FList.Chat.channels.getData(tabdata.id);
@@ -1091,11 +1092,12 @@ FList.Chat.TabBar = new function TabBar() {
 
         }
 
-        if (FList.Window.Notice.tabTally[tabdata.id.toLowerCase()]) {
+        if (tabdata.id.toLowerCase() in
+                FList.Window.Notice.tabTally) {
             FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
         }
-
     };
+
     this.removeTab = function(_type, _id){
         var tab=this.getTabFromId(_type, _id);
         FList.Chat.Activites.noIndicate(tab.tab);
@@ -1108,6 +1110,7 @@ FList.Chat.TabBar = new function TabBar() {
         lastClose=tab;
         $("#header-fchat").FlexMenu("item-enable", "mnu-tab-undo");
     };
+
     this.undoClose = function(){
         if(lastClose!==false){
             if(lastClose.type==="channel") FList.Chat.openChannelChat(lastClose.id, false);
@@ -1162,11 +1165,11 @@ FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _message
     var scrollDown=false,
         highlight=false,
         classList="chat-message chat-type-" + _messagetype,
-        tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
+        tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase();
         ct = new Date(),
         time=ct.getHours() + ":" + (ct.getMinutes() < 10 ? "0" + ct.getMinutes() : ct.getMinutes()) + " " + (ct.getHours() > 11 ? "PM" : "AM");
     if(_origin===FList.Chat.identity) classList +=" chat-type-own";
-  if($("#chat-content-chatarea > div").prop("scrollTop")>=($("#chat-content-chatarea > div").prop("scrollHeight")- $('#chat-content-chatarea > div').height() )-50) { scrollDown=true; }
+    if($("#chat-content-chatarea > div").prop("scrollTop")>=($("#chat-content-chatarea > div").prop("scrollHeight")- $('#chat-content-chatarea > div').height() )-50) scrollDown=true;
     if(_message.substring(0,6)==="/warn " && _type==="channel"){
     if(jQuery.inArray(_origin,FList.Chat.opList)!==-1 || jQuery.inArray(_origin,FList.Chat.channels.getData(_id).oplist)!== -1){
             _message=_message.substring(6);
@@ -1231,8 +1234,8 @@ FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _message
     FList.Chat.Logs.Store(tab);
 
     if (_origin.toLowerCase() !== "system" &&
-       (_type === "user" || highlight) &&
-       (!focus || tabFocus !== _id.toLowerCase())) {
+            (_type === "user" || highlight) &&
+            (!focus || tabFocus !== _id.toLowerCase())) {
         FList.Window.Notice.newMsg(_id.toLowerCase());
     }
 
@@ -1626,7 +1629,7 @@ FList.Chat.Logs = {
     }
 };
 
- /**
+/**
  * Adds a notification in the browser tab title that you have unread private messages.
  * If you wish to use this feature prior to it being pushed onto the 2.0 client live
  * just copy this code and paste it into your browser's console within the F-Chat tab.
@@ -1647,11 +1650,13 @@ FList.Window = {
     }
 };
 
+var focus; /**@define {Boolean} focus Global window focus variable*/
+
 /**
  * Title draw function.
  */
 FList.Window.Notice.draw = function() {
-    document.title = 'F-list - Chat (' + this.tabTally.sum + ')';
+    document.title = '(' + this.tabTally.sum + ') F-list - Chat';
 };
 
 /**
@@ -1660,7 +1665,7 @@ FList.Window.Notice.draw = function() {
  */
 FList.Window.Notice.newMsg = function(tab) {
 
-    if (this.tabTally[tab]) {
+    if (tab in this.tabTally) {
         this.tabTally[tab] += 1;
     } else {
         this.tabTally[tab] = 1;
@@ -1683,24 +1688,26 @@ FList.Window.Notice.readMsg = function(tab) {
 
     this.tabTally.sum -= this.tabTally[tab];
 
-    this.tabTally[tab] = 0;
+    delete this.tabTally[tab];
 
     if (this.tabTally.sum) {
         this.draw();
     } else {
+        delete this.tabTally.sum;
         document.title = "F-list - Chat";
     }
 
 };
 
 /**
- * Sets a global 'focus' variable, which returns true/false to check if the user is currently focused on this window.
+ * Sets a global 'focus' variable, which sets a true/false value to check if the user is currently focused on this window.
  * Checks if on focus will allow the person to read backlogged notifications.
  */
 window.onfocus = function() {
     focus = true;
 
-    if (FList.Window.Notice.tabTally[FList.Chat.TabBar.activeTab.id.toLowerCase()]) {
+    if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
+            FList.Window.Notice.tabTally) {
         FList.Window.Notice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
     }
 };
