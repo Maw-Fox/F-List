@@ -1165,7 +1165,7 @@ FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _message
     var scrollDown=false,
         highlight=false,
         classList="chat-message chat-type-" + _messagetype,
-        tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase();
+        tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
         ct = new Date(),
         time=ct.getHours() + ":" + (ct.getMinutes() < 10 ? "0" + ct.getMinutes() : ct.getMinutes()) + " " + (ct.getHours() > 11 ? "PM" : "AM");
     if(_origin===FList.Chat.identity) classList +=" chat-type-own";
