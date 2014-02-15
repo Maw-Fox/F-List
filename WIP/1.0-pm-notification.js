@@ -19,19 +19,13 @@ FList.Window = {
     }
 };
 
-(function(){
-
-var tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex], /**@define {Object} tabFocus Alias for active tab*/
-    Notice = FList.Window.Notice; /**@define {Object} Notice Alias for this namespace, without using this.*/
-
 /**
  * Title draw function.
  */
-
 FList.Window.Notice.draw = function() {
 
-    document.title = "F-Chat (" + FList.Chat_identity + ") (" +
-                     Notice.tabTally.sum+")";
+    document.title = "(" + FList.Window.Notice.tabTally.sum +
+        ") F-Chat (" + FList.Chat_identity + ")";
 
 };
 
@@ -41,19 +35,19 @@ FList.Window.Notice.draw = function() {
  */
 FList.Window.Notice.newMsg = function(tab) {
 
-    if (Notice.tabTally[tab]) {
-        Notice.tabTally[tab] += 1;
+    if (tab in FList.Window.Notice.tabTally) {
+        FList.Window.Notice.tabTally[tab] += 1;
     } else {
-        Notice.tabTally[tab] = 1;
+        FList.Window.Notice.tabTally[tab] = 1;
     }
 
-    if (Notice.tabTally.sum) {
-        Notice.tabTally.sum += 1;
+    if (FList.Window.Notice.tabTally.sum) {
+        FList.Window.Notice.tabTally.sum += 1;
     } else {
-        Notice.tabTally.sum = 1;
+        FList.Window.Notice.tabTally.sum = 1;
     }
 
-    Notice.draw();
+    FList.Window.Notice.draw();
 };
 
 /**
@@ -61,14 +55,14 @@ FList.Window.Notice.newMsg = function(tab) {
  * @param {string} tab Current tab ID
  */
 FList.Window.Notice.readMsg = function(tab) {
+    FList.Window.Notice.tabTally.sum -= FList.Window.Notice.tabTally[tab];
 
-    Notice.tabTally.sum -= Notice.tabTally[tab];
+    delete FList.Window.Notice.tabTally[tab];
 
-    Notice.tabTally[tab] = 0;
-
-    if (Notice.tabTally.sum) {
-        Notice.draw();
+    if (FList.Window.Notice.tabTally.sum) {
+        FList.Window.Notice.draw();
     } else {
+        delete FList.Window.Notice.tabTally.sum;
         document.title = "F-Chat (" + FList.Chat_identity + ")";
     }
 
@@ -79,12 +73,12 @@ FList.Window.Notice.readMsg = function(tab) {
  * Checks if on focus will allow the person to read backlogged notifications.
  */
 window.onfocus = function() {
+    var tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
+
     focus = true;
 
-    tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
-
-    if (Notice.tabTally[tabFocus]) {
-        Notice.readMsg(tabFocus);
+    if (tabFocus in FList.Window.Notice.tabTally) {
+        FList.Window.Notice.readMsg(tabFocus);
     }
 };
 
@@ -100,7 +94,8 @@ window.onblur = function() {
  */
 FList.FChat_printMessage = function(message, type, origin, tab, addclasses){
     var scrollDown=false,
-        wasMentioned = false;
+        wasMentioned = false,
+        tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
     if($("#ChatArea .inner").prop("scrollTop")>=($("#ChatArea .inner").prop("scrollHeight")- $('#ChatArea .inner').height() )-50) scrollDown=true;
     var printclass=type;
     if(tab!=='all' && tab != 'reallyall' && type != "ChatTypeWarn"){
@@ -204,12 +199,10 @@ FList.FChat_printMessage = function(message, type, origin, tab, addclasses){
         $("#ChatArea .inner").scrollTop($("#ChatArea .inner").prop("scrollHeight") - $('#ChatArea .inner').height());
     FList.Chat.Logs.Store(tab);
 
-    tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
-
     if ((type === "ChatTypeChat" || type === "ChatTypeAction") &&
        (FList.Chat_tabs.list[tab].type === "person" || wasMentioned) &&
        (!focus || tabFocus !== FList.Chat_tabs.list[tab].id.toLowerCase())) {
-        Notice.newMsg(FList.Chat_tabs.list[tab].id.toLowerCase());
+        FList.Window.Notice.newMsg(FList.Chat_tabs.list[tab].id.toLowerCase());
     }
 
 };
@@ -280,10 +273,9 @@ FList.Chat_tabs.switchTab = function(index){
     FList.Chat_DisplayInfoBar(this.list[index].id);
     FList.Chat_typing.indicate();
 
-    tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
-
-    if (Notice.tabTally[this.list[index].id.toLowerCase()]) {
-        Notice.readMsg(this.list[index].id.toLowerCase());
+    if (this.list[index].id.toLowerCase() in
+            FList.Window.Notice.tabTally) {
+        FList.Window.Notice.readMsg(this.list[index].id.toLowerCase());
     }
 
 };
@@ -298,14 +290,9 @@ FList.Chat_tabs.closeTab = function(index) {
     this.update();
     if(this.currentIndex==index) this.switchTab(this.findOpen("up"));
 
-    if (Notice.tabTally[this.list[index].id.toLowerCase()]) {
-        Notice.readMsg(this.list[index].id.toLowerCase());
+    if (this.list[index].id.toLowerCase() in
+            FList.Window.Notice.tabTally) {
+        FList.Window.Notice.readMsg(this.list[index].id.toLowerCase());
     }
 
 };
-
-})();
-
-/**
- * End of Hooks/Notifications file.
- */
