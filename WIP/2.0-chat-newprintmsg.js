@@ -1095,9 +1095,10 @@ FList.Chat.TabBar = new function TabBar() {
         }
 
         if (tabdata.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
-                FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
+           FList.Window.Notice.tabTally) {
+            FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
         }
+
     };
 
     this.removeTab = function(_type, _id){
@@ -1360,9 +1361,9 @@ FList.Chat.printMessage = function(args){
 
     FList.Chat.Logs.Store(tab);
 
-    if (args.from.toLowerCase() !== "system" &&
-        (args.to.type === "user" || highlight) &&
-        (!focus || tabFocus !== args.to.id.toLowerCase())) {
+    if (args.from !== "System" &&
+       (_type === "user" || highlight) &&
+       (!focus || tabFocus !== args.to.id.toLowerCase())) {
             FList.Window.Notice.newMsg(args.to.id.toLowerCase());
     }
 
@@ -1774,7 +1775,6 @@ FList.Chat.Logs = {
  *
  * @author Kali/Maw
  */
-
 FList.Window = {
     Notice: {
         tabTally: {}
