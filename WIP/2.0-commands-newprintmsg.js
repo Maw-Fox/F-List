@@ -4,7 +4,7 @@ FList.Chat.parseCommand = function (line)
 {
     line = line.replace(/</g, "&lt;");
     line = line.replace(/>/g, "&gt;");
-    if (jQuery.trim(line))
+    if (!jQuery.trim(line))
     {
         return;
     }
