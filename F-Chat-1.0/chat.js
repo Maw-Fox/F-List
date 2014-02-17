@@ -5,6 +5,15 @@
 //they may take whatever case as input and perform case conversions on the comparison.
 //variables and arrays should all store names escaped and with the correct casing. if a name is displayed, an unescape() should occur.
 
+       ///////////////////////////////////////////////REVISIONS//////////////////////////////////////////////////////////
+      // Features:                                                                                                    //
+     // -->PM logs now use acct_toUser syntax when stored to localStorage so they only display per-character to avoid//
+    //    public computers that have multiple fchat users to see someone else's conversations. Oh my!               //
+   // -->PM log settings preferences are partitioned from the truncate settings.                                   //
+  // Various fixes                                                                                                //
+ // -->typeError when users try and manually save their logs on a user window. (TypeError: logs[i])              //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 WEB_SOCKET_SWF_LOCATION = "../WebSocket.swf";
 WEB_SOCKET_DEBUG = false;
 FList.Chat_ws=0;
@@ -822,7 +831,7 @@ FList.Chat_tabs = new function ChatTabs() {
     };
 
     //hide open tab.
-    this.closeTab = function(index) {
+    this.closeTab = function(index){
          $("#ChatTab" + index).qtip("destroy");
         // closing a tab means we aren't typing anymore.
         if (this.list[index].type == "person") {
@@ -831,12 +840,6 @@ FList.Chat_tabs = new function ChatTabs() {
         this.list[index].closed=true;
         this.update();
         if(this.currentIndex==index) this.switchTab(this.findOpen("up"));
-
-        if (this.list[index].id.toLowerCase() in
-                FList.Window.Notice.tabTally) {
-            FList.Window.Notice.readMsg(this.list[index].id.toLowerCase());
-        }
-
     };
 
     //completely render the tab bar from scratch.
@@ -1051,12 +1054,6 @@ FList.Chat_tabs = new function ChatTabs() {
         FList.Chat_users.update();
         FList.Chat_DisplayInfoBar(this.list[index].id);
         FList.Chat_typing.indicate();
-
-        if (this.list[index].id.toLowerCase() in
-                FList.Window.Notice.tabTally) {
-            FList.Window.Notice.readMsg(this.list[index].id.toLowerCase());
-        }
-
     };
 
     //Make a tab blink; only to be used as activity indicator.
@@ -1849,7 +1846,7 @@ FList.Chat_translation = new function ChatTranslation() {
 
 FList.Chat_prefs = new function ChatPrefs() {
     this.currentPrefs = {
-        defaultChannels: ["Frontpage"],
+        defaultChannels: [],
         muteSound: false,
         alwaysSound: false,
         swapMouse: false,
@@ -2776,8 +2773,6 @@ FList.Chat_commands['FLN'] = function(params) {
             return false;
         }
     });
-    delete FList.Chat_users.userdata[params.character];
-    delete FList.Chat_users.links[params.character];
 };
 FList.Chat_commands['HLO'] = function(params) {//server welcome message
     if (FList.Chat_reconnecting) {
@@ -2786,8 +2781,7 @@ FList.Chat_commands['HLO'] = function(params) {//server welcome message
         return;
     }
     var message = params.message;
-    FList.FChat_printMessage(FList.ChatParser.parseContent(message), "ChatTypeNotice", "", 0);
-    FList.FChat_printMessage("Enter /help for command info.", "ChatTypeInfo","", 0);
+    FList.FChat_printMessage(FList.ChatParser.parseContent(message + "\n\nClick the 'channels' button up top to choose a channel, or try [channel]Sex Driven LFRP[/channel] or [channel]Non-Sex Driven LfRP[/channel] to advertise for RP partners, [channel]RP Bar[/channel], [channel]RP Dark City[/channel] or [channel]RP Nudist Camp[/channel] for general RP, or [channel]Frontpage[/channel] for general OOC chatter.\n\nTo log out and retrieve your logs when you're done, click the 'F-Chat(####)' button up top.\n\nFor more help, type /help for command info, or join the [channel]Helpdesk[/channel] channel.\n\nRemember to follow the [url=https://wiki.f-list.net/index.php/Rules]site rules[/url]!"), "ChatTypeInfo","", 0);
 };
 FList.Chat_commands['ADL'] = function(params) {
     var names = params.ops;
@@ -4525,118 +4519,110 @@ FList.Chat_truncateMessage = function(text, maxchars) {
     return result;
 };
 
-FList.FChat_printMessage = function(message, type, origin, tab, addclasses){
-    var scrollDown=false,
-        wasMentioned = false,
-        tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
-    if($("#ChatArea .inner").prop("scrollTop")>=($("#ChatArea .inner").prop("scrollHeight")- $('#ChatArea .inner').height() )-50) scrollDown=true;
-    var printclass=type;
-    if(tab!=='all' && tab != 'reallyall' && type != "ChatTypeWarn"){
-        if(FList.Chat_tabs.list[tab].type=="channel" && origin!==FList.Chat_identity){
-            if(FList.Chat_detectHighlight(message) && type != "ChatTypeLeave" && type != "ChatTypeJoin") {
-                wasMentioned = true;
-                if(!FList.Chat_isTabOpen){
-                    FList.Chat_notification.create(message, origin + " mentioned you.", origin,tab);
+FList.FChat_printMessage
+ = function(message, type, origin, tab, addclasses){
+        var scrollDown=false;
+        if($("#ChatArea .inner").prop("scrollTop")>=($("#ChatArea .inner").prop("scrollHeight")- $('#ChatArea .inner').height() )-50) scrollDown=true;
+        var printclass=type;
+        if(tab!=='all' && tab != 'reallyall' && type != "ChatTypeWarn"){
+            if(FList.Chat_tabs.list[tab].type=="channel" && origin!==FList.Chat_identity){
+                if(FList.Chat_detectHighlight(message) && type != "ChatTypeLeave" && type != "ChatTypeJoin") {
+                    if(!FList.Chat_isTabOpen){
+                        FList.Chat_notification.create(message, origin + " mentioned you.", origin,tab);
+                    }
+                    printclass="ChatTypeAttention";
+                    FList.Chat_tabs.flashTab(tab);
+                } else if ($.inArray(FList.Chat_tabs.list[tab].id, FList.Chat_bingTabs) > -1 &&
+                        type != "ChatTypeJoin" && type != "ChatTypeLeave") {
+                    FList.Chat_playSound("attention");
                 }
-                printclass="ChatTypeAttention";
-                FList.Chat_tabs.flashTab(tab);
-            } else if ($.inArray(FList.Chat_tabs.list[tab].id, FList.Chat_bingTabs) > -1 &&
-                    type != "ChatTypeJoin" && type != "ChatTypeLeave") {
-                FList.Chat_playSound("attention");
             }
         }
-    }
-    var rankclass="";
-    if (typeof(addclasses) == "string" && addclasses.length > 0) printclass += " " + addclasses;
-    if(jQuery.inArray(origin,FList.Chat_users.ops)!=-1) {
-        var avatarclass = "AvatarLink OpLink";
-        rankclass="<span class='RankChatop'></span>";
-    }
-    else if(tab!=='all' && tab != 'reallyall' && FList.Chat_ischanowner(origin,FList.Chat_tabs.list[tab].id)==1) {
-        var avatarclass = "AvatarLink ChanOwnerLink";
-        rankclass="<span class='RankOwner'></span>";
-    }
-    else if(tab!=='all' && tab != 'reallyall' && FList.Chat_ischanop(origin,FList.Chat_tabs.list[tab].id)==1) {
-        var avatarclass = "AvatarLink ChanOpLink";
-        rankclass="<span class='RankChanop'></span>";
-    }
-    else if(jQuery.inArray(origin,FList.Chat_users.tracklist)!=-1) var avatarclass = "AvatarLink FriendLink";
-    else var avatarclass = "AvatarLink";
+        var rankclass="";
+        if (typeof(addclasses) == "string" && addclasses.length > 0) printclass += " " + addclasses;
+        if(jQuery.inArray(origin,FList.Chat_users.ops)!=-1) {
+            var avatarclass = "AvatarLink OpLink";
+            rankclass="<span class='RankChatop'></span>";
+        }
+        else if(tab!=='all' && tab != 'reallyall' && FList.Chat_ischanowner(origin,FList.Chat_tabs.list[tab].id)==1) {
+            var avatarclass = "AvatarLink ChanOwnerLink";
+            rankclass="<span class='RankOwner'></span>";
+        }
+        else if(tab!=='all' && tab != 'reallyall' && FList.Chat_ischanop(origin,FList.Chat_tabs.list[tab].id)==1) {
+            var avatarclass = "AvatarLink ChanOpLink";
+            rankclass="<span class='RankChanop'></span>";
+        }
+        else if(jQuery.inArray(origin,FList.Chat_users.tracklist)!=-1) var avatarclass = "AvatarLink FriendLink";
+        else var avatarclass = "AvatarLink";
 
-    if(origin in FList.Chat_users.userdata && (avatarclass != "AvatarLink FriendLink")) avatarclass += " Gender" + FList.Chat_users.userdata[origin].gender;
+        if(origin in FList.Chat_users.userdata && (avatarclass != "AvatarLink FriendLink")) avatarclass += " Gender" + FList.Chat_users.userdata[origin].gender;
 
-    if(type=="ChatTypeAction") {
-        var norigin = origin;
-        if (message.substr(0,2) == "'s") {
-            message = message.substr(2);
-            message="*<a class='" + avatarclass + "'>" + rankclass + norigin + "</a>'s " + message;
+        if(type=="ChatTypeAction") {
+            var norigin = origin;
+            if (message.substr(0,2) == "'s") {
+                message = message.substr(2);
+                message="*<a class='" + avatarclass + "'>" + rankclass + norigin + "</a>'s " + message;
+            }
+            else message="*<a class='" + avatarclass + "'>" + rankclass + norigin + "</a> " + message;
         }
-        else message="*<a class='" + avatarclass + "'>" + rankclass + norigin + "</a> " + message;
-    }
-    var ct = new Date();
-    var time=ct.getHours() + ":" + (ct.getMinutes() < 10 ? "0" + ct.getMinutes() : ct.getMinutes()) + " " + (ct.getHours() > 11 ? "PM" : "AM");
-    if(origin=="" || (type!=="ChatTypeChat" && type != "ChatTypeWarn" && type!="ChatTypeAd")){
-        var html='<span class="ChatMessage ' + printclass + '"><span class="ChatTimestamp">[' + time + ']</span>' + message +'</span>';
-    } else {
-        if (parseInt(tab) > 0) {
-            var mytab = FList.Chat_tabs.list[tab];
-            if (mytab.type == "channel" && type=="ChatTypeAd")
-                message = FList.Chat_truncateMessage(message, FList.Chat_truncateMaxChars);
+        var ct = new Date();
+        var time=ct.getHours() + ":" + (ct.getMinutes() < 10 ? "0" + ct.getMinutes() : ct.getMinutes()) + " " + (ct.getHours() > 11 ? "PM" : "AM");
+        if(origin=="" || (type!=="ChatTypeChat" && type != "ChatTypeWarn" && type!="ChatTypeAd")){
+            var html='<span class="ChatMessage ' + printclass + '"><span class="ChatTimestamp">[' + time + ']</span>' + message +'</span>';
+        } else {
+            if (parseInt(tab) > 0) {
+                var mytab = FList.Chat_tabs.list[tab];
+                if (mytab.type == "channel" && type=="ChatTypeAd")
+                    message = FList.Chat_truncateMessage(message, FList.Chat_truncateMaxChars);
+            }
+            var html="<span class='ChatMessage " + printclass + "'><span class='ChatTimestamp'>[" + time + "]</span><a class='" + avatarclass + "'>" + rankclass + origin + "</a>: " + message + "</span>";
         }
-        var html="<span class='ChatMessage " + printclass + "'><span class='ChatTimestamp'>[" + time + "]</span><a class='" + avatarclass + "'>" + rankclass + origin + "</a>: " + message + "</span>";
-    }
-    var html = $(html);
-    // contextify any avatar links inside
-    //FList.Chat_contextMenu.bindTo(html.children(".AvatarLink"));
-    if(tab=="all"){//all is not all, just active tab and console.
-        var mytab = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex];
-        mytab.logs.unshift(html);
-        if (FList.Chat_truncateLogs == true) {
-            mytab.logs = mytab.logs.slice(0, FList.Chat_messageCap);
-        }
-        if(FList.Chat_tabs.currentIndex != 0){
-            FList.Chat_tabs.list[0].logs.unshift(html);
-        }
-        html.appendTo("#ChatArea .inner");
-     } else if(tab=="reallyall"){//ALL TABS, REALLY
-        for (var tabindex in FList.Chat_tabs.list) {
-            var mytab = FList.Chat_tabs.list[tabindex];
+        var html = $(html);
+        // contextify any avatar links inside
+        //FList.Chat_contextMenu.bindTo(html.children(".AvatarLink"));
+        if(tab=="all"){//all is not all, just active tab and console.
+            var mytab = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex];
             mytab.logs.unshift(html);
             if (FList.Chat_truncateLogs == true) {
                 mytab.logs = mytab.logs.slice(0, FList.Chat_messageCap);
             }
-        }
-        html.appendTo("#ChatArea .inner");
-    } else {
-        var mytab = FList.Chat_tabs.list[tab];
-        mytab.logs.unshift(html);
-        if (FList.Chat_truncateLogs == true ||
-            (mytab.type == "channel" && FList.Chat_channels.getInstance(mytab.id).mode=="ads")){
-                mytab.logs = mytab.logs.slice(0, FList.Chat_messageCap);
-        }
-        if(tab==FList.Chat_tabs.currentIndex){
+            if(FList.Chat_tabs.currentIndex != 0){
+                FList.Chat_tabs.list[0].logs.unshift(html);
+            }
             html.appendTo("#ChatArea .inner");
+         } else if(tab=="reallyall"){//ALL TABS, REALLY
+            for (var tabindex in FList.Chat_tabs.list) {
+                var mytab = FList.Chat_tabs.list[tabindex];
+                mytab.logs.unshift(html);
+                if (FList.Chat_truncateLogs == true) {
+                    mytab.logs = mytab.logs.slice(0, FList.Chat_messageCap);
+                }
+            }
+            html.appendTo("#ChatArea .inner");
+        } else {
+            var mytab = FList.Chat_tabs.list[tab];
+            mytab.logs.unshift(html);
+            if (FList.Chat_truncateLogs == true ||
+                (mytab.type == "channel" && FList.Chat_channels.getInstance(mytab.id).mode=="ads")){
+                    mytab.logs = mytab.logs.slice(0, FList.Chat_messageCap);
+            }
+            if(tab==FList.Chat_tabs.currentIndex){
+                html.appendTo("#ChatArea .inner");
+            }
         }
-    }
-    if($(".ChatMessage").length>FList.Chat_messageCap){
-        $(".ChatMessage:first").remove();
-    }
-    if (type == "ChatTypeAd") {
-        FList.Chat_ads.receiveAd(html);
-    }
-    if(FList.Chat_filtermode=="hideads" && type=="ChatTypeAd")
-        $(".ChatTypeAd:last").hide();
-    if(FList.Chat_filtermode=="hidechats" && (type=="ChatTypeChat" || type=="ChatTypeAction"))
-        $(".ChatTypeChat, .ChatTypeAction").hide();
-    if(scrollDown)
-        $("#ChatArea .inner").scrollTop($("#ChatArea .inner").prop("scrollHeight") - $('#ChatArea .inner').height());
-    FList.Chat.Logs.Store(tab);
-
-    if ((type === "ChatTypeChat" || type === "ChatTypeAction") &&
-       (FList.Chat_tabs.list[tab].type === "person" || wasMentioned) &&
-       (!focus || tabFocus !== FList.Chat_tabs.list[tab].id.toLowerCase())) {
-        FList.Window.Notice.newMsg(FList.Chat_tabs.list[tab].id.toLowerCase());
-    }
+        if($(".ChatMessage").length>FList.Chat_messageCap){
+            $(".ChatMessage:first").remove();
+        }
+        if (type == "ChatTypeAd") {
+            FList.Chat_ads.receiveAd(html);
+        }
+        if(FList.Chat_filtermode=="hideads" && type=="ChatTypeAd")
+            $(".ChatTypeAd:last").hide();
+        if(FList.Chat_filtermode=="hidechats" && (type=="ChatTypeChat" || type=="ChatTypeAction"))
+            $(".ChatTypeChat, .ChatTypeAction").hide();
+        if(scrollDown)
+            $("#ChatArea .inner").scrollTop($("#ChatArea .inner").prop("scrollHeight") - $('#ChatArea .inner').height());
+        FList.Chat.Logs.Store(tab);
 
 };
 
@@ -4963,8 +4949,7 @@ FList.Memo = {
     }
 };
 
-FList.Chat= {};
-
+FList.Chat=function(){};
 FList.Chat.Logs = {
     Draw: function(tab_index){
         var lsArray,uid,acct,acctStr;
@@ -5000,11 +4985,10 @@ FList.Chat.Logs = {
     },
     Store: function(tab_index){
         if( $("#ChatTab"+tab_index).hasClass("ChatPersonTab") && typeof(Storage)!==undefined && FList.Chat_prefs.currentPrefs.logPM != true){
-            var lsArray,uid,acct,acctStr,time,x,y,m;
+            var lsArray,uid,acct,acctStr,time,x,y;
             acct = FList.Chat_identity;
             x = new Date();
             y = (x.getDate()<10) ? "0"+x.getDate(): x.getDate();
-            m = ((x.getMonth()+1)<10) ? "0"+(x.getMonth()+1): (x.getMonth()+1);
             time = Math.floor((new Date()).getTime()/1000);
             uid = FList.Chat_tabs.list[tab_index].id;
             acctStr = acct+"_"+uid;
@@ -5022,7 +5006,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(new Date().getFullYear()-2000)+"$3"))) +","+ lsArray.join());
+                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+new Date().getMonth()+1+"/"+(new Date().getFullYear()-2000)+"$3"))) +","+ lsArray.join());
             } else {
                 if(FList.Chat_tabs.list[tab_index].hasDrawn===undefined){
                     if(FList.Chat_tabs.list[tab_index].localLogsOffset != undefined){
@@ -5032,7 +5016,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(new Date().getFullYear()-2000)+"$3")));
+                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+new Date().getMonth()+1+"/"+(new Date().getFullYear()-2000)+"$3")));
             }
             if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
             if(parseInt(localStorage["nextPreen"])<time){
@@ -5048,95 +5032,4 @@ FList.Chat.Logs = {
             }
         }
     }
-};
-
-/**
- * Adds a notification in the browser tab title that you have unread private messages.
- * If you wish to use this feature prior to it being pushed onto the 2.0 client live
- * just copy this code and paste it into your browser's console within the F-Chat tab.
- * Just keep in mind there could be minor bugs. Let me know if you find any.
- *
- * If you encounter any issues using this feature, you can remove it manually or
- * refresh your page to get rid of it. To manually remove this feature, open your browser's
- * console and delete the namespace associated with it by typing 'delete Kali' and pressing enter.
- *
- * Enjoy, and as always, have fun!
- *
- * @author Kali/Maw
- */
-
-FList.Window = {
-    Notice: {
-        tabTally: {}
-    }
-};
-
-/**
- * Title draw function.
- */
-FList.Window.Notice.draw = function() {
-
-    document.title = "(" + FList.Window.Notice.tabTally.sum +
-        ") F-Chat (" + FList.Chat_identity + ")";
-
-};
-
-/**
- * Title tally function.
- * @param {string} tab Current tab ID
- */
-FList.Window.Notice.newMsg = function(tab) {
-
-    if (tab in FList.Window.Notice.tabTally) {
-        FList.Window.Notice.tabTally[tab] += 1;
-    } else {
-        FList.Window.Notice.tabTally[tab] = 1;
-    }
-
-    if (FList.Window.Notice.tabTally.sum) {
-        FList.Window.Notice.tabTally.sum += 1;
-    } else {
-        FList.Window.Notice.tabTally.sum = 1;
-    }
-
-    FList.Window.Notice.draw();
-};
-
-/**
- * On focus, subtract total unread messages from newly viewed tab from the title, then draw.
- * @param {string} tab Current tab ID
- */
-FList.Window.Notice.readMsg = function(tab) {
-    FList.Window.Notice.tabTally.sum -= FList.Window.Notice.tabTally[tab];
-
-    delete FList.Window.Notice.tabTally[tab];
-
-    if (FList.Window.Notice.tabTally.sum) {
-        FList.Window.Notice.draw();
-    } else {
-        delete FList.Window.Notice.tabTally.sum;
-        document.title = "F-Chat (" + FList.Chat_identity + ")";
-    }
-
-};
-
-/**
- * Sets a global 'focus' variable, which returns true/false to check if the user is currently focused on this window.
- * Checks if on focus will allow the person to read backlogged notifications.
- */
-window.onfocus = function() {
-    var tabFocus = FList.Chat_tabs.list[FList.Chat_tabs.currentIndex].id.toLowerCase();
-
-    focus = true;
-
-    if (tabFocus in FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(tabFocus);
-    }
-};
-
-/**
- * Sets a global 'focus' variable
- */
-window.onblur = function() {
-    focus = false;
-};
+}
