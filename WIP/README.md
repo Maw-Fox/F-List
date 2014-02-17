@@ -1,4 +1,4 @@
-WIP Subdirectory
+WIP Features/Changes
 ======
 
 Welcome to the Work in Progress features subdirectory for F-List's currently in development feature additions programmed by Kali/Maw.
