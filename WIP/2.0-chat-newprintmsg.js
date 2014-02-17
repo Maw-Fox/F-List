@@ -391,8 +391,8 @@ FList.Chat.Status = {
     },
 
     set: function(status, message){
-        FList.Chat.printMessage({msg: ('Your status was set to ' + (status === 'Crown') ? 'Cookie': status) +
-                                (message.length > 0 ? ', "' + FList.Chat.Input.sanitize(message) + '"' : '')),
+        FList.Chat.printMessage({msg: 'Your status was set to ' + (((status === 'Crown') ? 'Cookie': status) +
+                                ((message.length > 0) ? ', "' + FList.Chat.Input.sanitize(message) + '"' : '')),
                                 from: 'System', type: 'system'});
         if(status!=="Idle"){
             this.lastStatus.status=status.toLowerCase();
@@ -1174,9 +1174,7 @@ FList.Chat.printMessage = function(args){
         highlight=false,
         isDefault = (!args.to || args.to === {} ||
                     args.to.id.toLowerCase() === this.TabBar.activeTab.id.toLowerCase()) ?
-                        true: false;
-        args.to = (isDefault) ? this.TabBar.activeTab: args.to;
-        args.log = (arg.log === undefined) ? true: args.log;
+                        true: false,
         classList = "chat-message chat-type-" + args.type,
         tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
         ct = new Date(),
@@ -1189,6 +1187,10 @@ FList.Chat.printMessage = function(args){
         tab,
         showmode,
         display;
+
+    args.to = (isDefault) ? this.TabBar.activeTab: args.to;
+
+    args.log = (args.log === undefined) ? true: args.log;
 
     if (!args.from || !args.msg || !args.type) {
         throw "Mandatory arguments missing on printMessage call.";
@@ -1231,7 +1233,7 @@ FList.Chat.printMessage = function(args){
 
             regx = new RegExp("\\b" + this.identity + "('s)?\\b", "i");
 
-            if (!highlight && reg.test(args.msg) &&
+            if (!highlight && regx.test(args.msg) &&
                 this.from !== this.identity && args.to.type === "channel") {
                     highlight = true;
             }
@@ -1243,7 +1245,7 @@ FList.Chat.printMessage = function(args){
     }
 
     avatarclasses = this.getPrintClasses(args.from,
-                                        (args.to.type === "channel") ? args.to.id: false);
+                                        ((args.to.type === "channel") ? args.to.id: false));
 
     if (args.type !== "chat" && args.type !== "ad" && args.type !== "rp") {
         avatarclasses = "";
@@ -1344,7 +1346,7 @@ FList.Chat.printMessage = function(args){
     }
 
     if (args.log) {
-        tab.logs.push({"type": _messagetype ,"by": _origin, "html": html});
+        tab.logs.push({"type": args.type ,"by": args.from, "html": html});
 
         if(!this.Settings.current.enableLogging){
 
@@ -1359,9 +1361,9 @@ FList.Chat.printMessage = function(args){
     FList.Chat.Logs.Store(tab);
 
     if (args.from.toLowerCase() !== "system" &&
-            (args.to.type === "user" || highlight) &&
-            (!focus || tabFocus !== args.to.id.toLowerCase())) {
-        FList.Window.Notice.newMsg(args.to.id.toLowerCase());
+        (args.to.type === "user" || highlight) &&
+        (!focus || tabFocus !== args.to.id.toLowerCase())) {
+            FList.Window.Notice.newMsg(args.to.id.toLowerCase());
     }
 
 };

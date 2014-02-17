@@ -91,7 +91,7 @@ FList.Connection = {
 
     send: function(line) {
         if (FList.Chat.debug) {
-            FList.Chat.printMessage({msg: line, FList.Chat.TabBar.getTabFromId('console', 'console'),
+            FList.Chat.printMessage({msg: line, to: FList.Chat.TabBar.getTabFromId('console', 'console'),
                                     from: 'Client', type: 'system'});
         }
 

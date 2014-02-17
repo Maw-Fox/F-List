@@ -20,6 +20,7 @@
  */
 (function () {
 
+FList.Chat.Input = {};
 FList.Chat.Input.Commands = {};
 
 /**
@@ -350,7 +351,7 @@ FList.Chat.Input.handle = function(msg) {
                 msg = FList.Chat.Input.sanitize(msg);
 
                 FList.Chat.printMessage({"msg": msg, to: FList.Chat.TabBar.getTabFromId('channel', curTab.id),
-                                        from: FList.Chat.identity, type: msgType);
+                                        from: FList.Chat.identity, type: msgType});
 
                 pass();
             }

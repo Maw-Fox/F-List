@@ -4,7 +4,7 @@ FList.Chat.parseCommand = function (line)
 {
     line = line.replace(/</g, "&lt;");
     line = line.replace(/>/g, "&gt;");
-    if (jQuery.trim(line) == "")
+    if (jQuery.trim(line))
     {
         return;
     }
@@ -46,13 +46,13 @@ FList.Chat.commands['STA'] = function (params)
     var printtab=FList.Chat.TabBar.getTabFromId("user", params.character);
     var active=params.character.toLowerCase()==FList.Chat.TabBar.activeTab.id && FList.Chat.TabBar.activeTab.type=="user";
     var message="[user]" + params.character + "[/user] changed status to " + sta + (params.statusmsg!=="" ? ", " + params.statusmsg : "");
-    if(printtab==false){//there is no tab open with this guy.
-        if(FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications && alert==true){//but we want notifications.
+    if (!printtab) {//there is no tab open with this guy.
+        if(FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications && alert){//but we want notifications.
             FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});//print stuff in the active tab.
         }
     }  else {//there is a tab open.
         if(active){//are we looking at it?
-            if(alert==true){//FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications &&
+            if(alert){//FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications &&
                 FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});//print stuff in the active tab.
             }
             FList.Chat.InfoBar.update();
@@ -71,9 +71,9 @@ FList.Chat.commands['STA'] = function (params)
         }
         FList.Chat.TabBar.updateTooltip(printtab);
     }
-	if(FList.Chat.TabBar.activeTab.type=="channel"){
-		FList.Chat.UserBar.updateUser(params.character);
-	}
+    if(FList.Chat.TabBar.activeTab.type=="channel"){
+        FList.Chat.UserBar.updateUser(params.character);
+    }
 };
 FList.Chat.commands['LIS'] = function (params)
 {
@@ -97,13 +97,13 @@ FList.Chat.commands['FLN'] = function (params)
     if(FList.Chat.TabBar.activeTab.type=="console"){
         $("#info-bar-actions").html(FList.Chat.users.count + " users connected.");
     }
-	if(FList.Chat.TabBar.activeTab.type=="channel"){
-		FList.Chat.UserBar.removeUser(params.character);
-	}
+    if(FList.Chat.TabBar.activeTab.type=="channel"){
+        FList.Chat.UserBar.removeUser(params.character);
+    }
     var printtab=FList.Chat.TabBar.getTabFromId("user", params.character);
     var active=params.character.toLowerCase()==FList.Chat.TabBar.activeTab.id && FList.Chat.TabBar.activeTab.type=="user";
     var message="[user]" + params.character + "[/user] is offline.";
-    if(printtab==false){//there is no tab open with this guy.
+    if(!printtab){//there is no tab open with this guy.
         if((FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications)){//but we want notifications.
             FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});//print stuff in the active tab.
         }
@@ -224,7 +224,7 @@ FList.Chat.commands['FRL'] = function (params)
 
 };
 FList.Chat.commands['CON'] = function(params) {
-	FList.Chat.users.count=parseInt(params.count);
+    FList.Chat.users.count=parseInt(params.count);
     if(FList.Chat.TabBar.activeTab.type=="console"){
         $("#info-bar-actions").html(FList.Chat.users.count + " users connected.");
     }
@@ -310,9 +310,9 @@ FList.Chat.commands['LCH'] = function (params)
                                     title + '.', to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                                     from: 'System', type: 'system'});
         }
-		if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
-			FList.Chat.UserBar.removeUser(params.character);
-		}
+        if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
+            FList.Chat.UserBar.removeUser(params.character);
+        }
     }
 };
 FList.Chat.commands['JCH'] = function (params)
@@ -320,7 +320,7 @@ FList.Chat.commands['JCH'] = function (params)
     if (params.character.identity == FList.Chat.identity)
     {
         var data = FList.Chat.channels.getData(params.channel);
-        if (data.created == false)
+        if (!data.created)
         {
             FList.Chat.channels.create(params.channel, params.title);
             data = FList.Chat.channels.getData(params.channel);
@@ -338,20 +338,20 @@ FList.Chat.commands['JCH'] = function (params)
                                     to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                                     from: 'System', type: 'system'});
         }
-		if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
-			FList.Chat.UserBar.insertSorted(params.character.identity);
-		}
+        if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
+            FList.Chat.UserBar.insertSorted(params.character.identity);
+        }
     }
     FList.Chat.channels.addUser(params.channel, params.character.identity);
 };
 FList.Chat.commands['CKU'] = function (params){
 if(params.character==FList.Chat.identity){
-	FList.Chat.TabBar.setActive("console","console");
-	FList.Chat.printMessage({msg: 'You were kicked from ' + params.channel + ' by <a class="AvatarLink">' +
+    FList.Chat.TabBar.setActive("console","console");
+    FList.Chat.printMessage({msg: 'You were kicked from ' + params.channel + ' by <a class="AvatarLink">' +
                             params.operator + '</a>. You may access logs from the logs tab.',
                             from: 'System', type: 'system'});
 } else {
-	FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> was kicked from ' +
+    FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> was kicked from ' +
                             params.channel + ' by <a class="AvatarLink">' + params.operator + '</a>.',
                             to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                             from: 'System', type: 'system'});
@@ -400,19 +400,21 @@ FList.Chat.commands['UPT'] = function(params) {
 FList.Chat.commands['SYS'] = function(params) {
     FList.Chat.printMessage({msg: params.message, from: 'System', type: 'system'});
 };
-FList.Chat.commands['MSG'] = function (params)
-{
+FList.Chat.commands['MSG'] = function (params) {
     if (jQuery.inArray(params.character.toLowerCase(), FList.Chat.ignoreList) !== -1) return;
     var message = params.message;
-	if(params.channel.toLowerCase()=="frontpage"){
-		message=message.replace(/\[icon\]/g, "[user]");message=message.replace(/\[\/icon\]/g, "[/user]");
-	}
+    if(params.channel.toLowerCase()=="frontpage"){
+        message=message.replace(/\[icon\]/g, "[user]");message=message.replace(/\[\/icon\]/g, "[/user]");
+    }
     var messagetype = "chat";
     if (FList.Chat.Roleplay.isRoleplay(message))
     {
         message = message.substring(3);
         messagetype = "rp";
     }
+    console.log({msg: message,
+                to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
+                from: params.character, type: messagetype});
     FList.Chat.printMessage({msg: message,
                             to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                             from: params.character, type: messagetype});
@@ -447,7 +449,7 @@ FList.Chat.commands['PRI'] = function (params)
         messagetype = "rp";
     }
     var tab = FList.Chat.TabBar.getTabFromId("user", params.character);
-    if (tab == false)
+    if (!tab)
     {
         FList.Chat.openPrivateChat(params.character, false);
     }
@@ -483,7 +485,7 @@ FList.Chat.commands['NLN'] = function (params)
     var printtab=FList.Chat.TabBar.getTabFromId("user", params.identity);
     var active=params.identity.toLowerCase()==FList.Chat.TabBar.activeTab.id && FList.Chat.TabBar.activeTab.type=="user";
     var message="[user]" + params.identity + "[/user] is online.";
-    if(printtab==false){//there is no tab open with this guy.
+    if (!printtab) {//there is no tab open with this guy.
         if ((FList.Chat.users.isTracked(params.identity) && FList.Chat.Settings.current.friendNotifications)) {//but we want notifications.
             FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});
         }
@@ -511,7 +513,7 @@ FList.Chat.commands['TPN'] = function(params) {
 
     if(jQuery.inArray(params.character.toLowerCase(),FList.Chat.ignoreList)!==-1) return;
     var printtab=FList.Chat.TabBar.getTabFromId("user", params.character);
-    if (printtab==false) return;
+    if (!printtab) return;
     printtab.tab.children(".tpn").removeClass("tpn-paused");
     switch(params.status){
         case "clear":
@@ -572,7 +574,7 @@ FList.Chat.commands['IGN'] = function (params)
     {
         var list = params.characters;
         FList.Chat.ignoreList = params.characters;
-        if (list.length == 0)
+        if (!list.length)
         {
             FList.Chat.printMessage({msg: 'You aren\'t ignoring anybody.',
                                     from: 'System', type: 'system'});
@@ -604,8 +606,8 @@ FList.Chat.commands['RMO'] = function(params) {
                                 to: params.channel, from: 'System', type: 'system'});
         channel.mode=params.mode;
         if((channel.mode=="ads" || channel.mode=="chat") && channel.userMode=="both") channel.userMode=channel.mode;
-        if(channel.userMode=="chat" & channel.mode=="ads") channel.userMode=channel.mode;
-        if(channel.userMode=="ads" & channel.mode=="chat") channel.userMode=channel.mode;
+        if(channel.userMode=="chat" && channel.mode=="ads") channel.userMode=channel.mode;
+        if(channel.userMode=="ads" && channel.mode=="chat") channel.userMode=channel.mode;
         if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
 
                 $(".send-input-ad, .send-input-chat").attr("disabled", false);
@@ -635,7 +637,7 @@ FList.Chat.commands['PRD'] = function(params) {
     if (params.type === 'start' || params.type === 'end') {
         FList.Chat.printMessage({msg: params.message, from: 'System', type: 'system'});
 
-
+    }
     if (params.type === 'info' || params.type === 'select') {
         FList.Chat.printMessage({msg: '<b>' + params.key + ':</b> ' + params.value,
                                 from: 'System', type: 'system'});
@@ -663,100 +665,100 @@ FList.Chat.commands['SFC'] = function(params) {
 FList.Chat.commands['RTB'] = function(params) {
     // we've received a site notification via realtime bridge
     if (params.type == "note") {
-		var message = '<b>Note from ' + params.sender + ':</b> <a href="/view_note.php?note_id=' + params.id + '" target="_blank">' + params.subject + '</a>';
-		FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});
+        var message = '<b>Note from ' + params.sender + ':</b> <a href="/view_note.php?note_id=' + params.id + '" target="_blank">' + params.subject + '</a>';
+        FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});
         //FList.Chat_playSound("newnote");
-		FList.Chat.Sound.playSound("newnote");
+        FList.Chat.Sound.playSound("newnote");
     }
-	else if (params.type == "comment") {
-		//FList.Chat_users.addTrack(params.name);
-		var url="";
-		switch(params.target_type){
-			case "newspost":
-				url=domain + "newspost/" + params.target_id + "/#Comment" + params.id;
-			break;
-			case "bugreport":
-				url=domain + "view_bugreport.php?id=" + params.target_id + "#" + params.id;
-			break;
-			case "changelog":
-				url=domain + "log.php?id=" + params.target_id + "#" + params.id;
-			break;
-			case "feature":
-				url=domain + "vote.php?fid=" + params.target_id + "#" + params.id;
-			break;
-			default:
-		}
-		if(params.parent_id==0){
-			FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name + '</a> commented on your ' +
+    else if (params.type == "comment") {
+        //FList.Chat_users.addTrack(params.name);
+        var url="";
+        switch(params.target_type){
+            case "newspost":
+                url=domain + "newspost/" + params.target_id + "/#Comment" + params.id;
+            break;
+            case "bugreport":
+                url=domain + "view_bugreport.php?id=" + params.target_id + "#" + params.id;
+            break;
+            case "changelog":
+                url=domain + "log.php?id=" + params.target_id + "#" + params.id;
+            break;
+            case "feature":
+                url=domain + "vote.php?fid=" + params.target_id + "#" + params.id;
+            break;
+            default:
+        }
+        if(params.parent_id==0){
+            FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name + '</a> commented on your ' +
                                     params.target_type + ', "[url=' + url + ']' + params.target + '[/url]"',
                                     from: 'System', type: 'system'});
-		} else {
-			FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name + '</a> replied to your comment on a ' +
+        } else {
+            FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name + '</a> replied to your comment on a ' +
                                     params.target_type + ', "[url=' + url + ']' + params.target + '[/url]"',
                                     from: 'System', type: 'system'});
-		}
-	}else if (params.type == "grouprequest") {
-		if(FList.Chat.Settings.current.alertsForGrouprequests){
-			FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+        }
+    }else if (params.type == "grouprequest") {
+        if(FList.Chat.Settings.current.alertsForGrouprequests){
+            FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                     '</a> requested a group named \"[url=' + domain + 'panel/group_requests.php]' +
                                     params.title + '[/url]"', from: "System", type: 'system'});
-		}
-	}else if (params.type == "trackadd") {
-		FList.Chat.printMessage({msg: 'Added <a class="AvatarLink">' + params.name + '</a> to your bookmarks',
+        }
+    }else if (params.type == "trackadd") {
+        FList.Chat.printMessage({msg: 'Added <a class="AvatarLink">' + params.name + '</a> to your bookmarks',
                                 from: 'System', type: 'system'});
-		FList.Chat.bookmarksList.push(params.name);
+        FList.Chat.bookmarksList.push(params.name);
 
-	}else if (params.type == "bugreport") {
-		if(FList.Chat.Settings.current.alertsForBugreports){
-		//FList.Chat_users.addTrack(params.name);
-		var url=domain + "view_bugreport.php?id=" + params.id;
-		FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+    }else if (params.type == "bugreport") {
+        if(FList.Chat.Settings.current.alertsForBugreports){
+        //FList.Chat_users.addTrack(params.name);
+        var url=domain + "view_bugreport.php?id=" + params.id;
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                 '</a> submitted a bugreport, "[url=' + url + ']' + params.title + '[/url]"',
                                 from: 'System', type: 'system'});
-		}
-	}else if (params.type == "helpdeskticket") {
-		if(FList.Chat.Settings.current.alertsForTickets){
-		//FList.Chat_users.addTrack(params.name);
-		var url=domain + "view_ticket.php?id=" + params.id;
-		FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+        }
+    }else if (params.type == "helpdeskticket") {
+        if(FList.Chat.Settings.current.alertsForTickets){
+        //FList.Chat_users.addTrack(params.name);
+        var url=domain + "view_ticket.php?id=" + params.id;
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                 '</a> submitted a helpdesk ticket, "[url=' + url + ']' + params.title + '[/url]"',
                                 from: 'System', type: 'system'});
-		}
-	}else if (params.type == "helpdeskreply") {
-		if(FList.Chat.Settings.current.alertsForTickets){
-		//FList.Chat_users.addTrack(params.name);
-		var url=domain + "view_ticket.php?id=" + params.id;
-		FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+        }
+    }else if (params.type == "helpdeskreply") {
+        if(FList.Chat.Settings.current.alertsForTickets){
+        //FList.Chat_users.addTrack(params.name);
+        var url=domain + "view_ticket.php?id=" + params.id;
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                 '</a> submitted a reply to a helpdesk ticket you were involved in, [url=' +
                                 url + ']located here[/url]', from: 'System', type: 'system'});
-		}
-	}else if (params.type == "featurerequest") {
-		if(FList.Chat.Settings.current.alertsForFeatures){
-		//FList.Chat_users.addTrack(params.name);
-		var url=domain + "vote.php?fid=" + params.id;
-		FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+        }
+    }else if (params.type == "featurerequest") {
+        if(FList.Chat.Settings.current.alertsForFeatures){
+        //FList.Chat_users.addTrack(params.name);
+        var url=domain + "vote.php?fid=" + params.id;
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                 '</a> submitted a feature request, "[url=' + url + ']' +
                                 params.title + '[/url]"', from: 'System', type: 'system'});
-		}
-	}
-	else if (params.type == "trackrem") {
-		//FList.Chat_users.removeTrack(params.name);
-		FList.Chat.printMessage({msg: 'Removed <a class="AvatarLink">' + params.name + '</a> from your bookmarks',
+        }
+    }
+    else if (params.type == "trackrem") {
+        //FList.Chat_users.removeTrack(params.name);
+        FList.Chat.printMessage({msg: 'Removed <a class="AvatarLink">' + params.name + '</a> from your bookmarks',
                                 from: 'System', type: 'system'});
-		for(var i in FList.Chat.bookmarksList){
-			if(FList.Chat.bookmarksList[i]== params.name){
-				FList.Chat.bookmarksList.splice(i, 1);
-			}
-		}
-	}
-	else if (params.type == "friendrequest") {
-		FList.Chat.printMessage({msg: '<a class="AvatarLink" target="_blank" href="../messages.php">' +
+        for(var i in FList.Chat.bookmarksList){
+            if(FList.Chat.bookmarksList[i]== params.name){
+                FList.Chat.bookmarksList.splice(i, 1);
+            }
+        }
+    }
+    else if (params.type == "friendrequest") {
+        FList.Chat.printMessage({msg: '<a class="AvatarLink" target="_blank" href="../messages.php">' +
                                 params.name + '</a> requested to be your friend. ', from: 'System', type: 'system'});
     } else if (params.type == "friendadd") {
-		//FList.Chat_users.addTrack(params.name);
-		FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
+        //FList.Chat_users.addTrack(params.name);
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.name +
                                 '</a> was added to your friends list.', from: 'System', type: 'system'});
-		FList.Chat.friendsList.push(params.name);
+        FList.Chat.friendsList.push(params.name);
 
     }
 };
