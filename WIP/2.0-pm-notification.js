@@ -164,9 +164,9 @@ FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _message
     FList.Chat.Logs.Store(tab);
 
     if (_origin.toLowerCase() !== "system" &&
-            (_type === "user" || highlight) &&
-            (!focus || tabFocus !== _id.toLowerCase())) {
-        FList.Window.Notice.newMsg(_id.toLowerCase());
+       (_type === "user" || highlight) &&
+       (!focus || tabFocus !== _id.toLowerCase())) {
+            FList.Window.Notice.newMsg(_id.toLowerCase());
     }
 
 };
@@ -241,7 +241,8 @@ FList.Chat.TabBar.closeTab = function(el){
     }
 
     if (tabdata.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
+       FList.Window.Notice.tabTally) {
         FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
     }
+
 };
