@@ -1849,7 +1849,7 @@ FList.Chat_translation = new function ChatTranslation() {
 
 FList.Chat_prefs = new function ChatPrefs() {
     this.currentPrefs = {
-        defaultChannels: ["Frontpage"],
+        defaultChannels: [],
         muteSound: false,
         alwaysSound: false,
         swapMouse: false,
@@ -2786,8 +2786,16 @@ FList.Chat_commands['HLO'] = function(params) {//server welcome message
         return;
     }
     var message = params.message;
-    FList.FChat_printMessage(FList.ChatParser.parseContent(message), "ChatTypeNotice", "", 0);
-    FList.FChat_printMessage("Enter /help for command info.", "ChatTypeInfo","", 0);
+    FList.FChat_printMessage(FList.ChatParser.parseContent(message +
+                            "\n\nClick the 'channels' button up top to choose a channel, or try" +
+                            " [channel]Sex Driven LFRP[/channel] or [channel]Non-Sex Driven LfRP[/channel]" +
+                            " to advertise for RP partners, [channel]RP Bar[/channel], [channel]RP Dark City[/channel]" +
+                            " or [channel]RP Nudist Camp[/channel] for general RP, or [channel]Frontpage[/channel]" + 
+                            " for general OOC chatter.\n\nTo log out and retrieve your logs when you're done, click" +
+                            " the 'F-Chat(####)' button up top.\n\nFor more help, type /help for command info," +
+                            " or join the [channel]Helpdesk[/channel] channel.\n\nRemember to follow the" + 
+                            " [url=https://wiki.f-list.net/index.php/Rules]site rules[/url]!"), 
+                            "ChatTypeInfo","", 0);
 };
 FList.Chat_commands['ADL'] = function(params) {
     var names = params.ops;
