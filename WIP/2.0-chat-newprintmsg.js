@@ -1,23 +1,20 @@
-/**
- * Changelog 2.0 ---- As of 2/13/2014
- *
- * Fixed:
- * Bug with dates on persisting PM logs.
- * Various other fixes.
- *
- * New features/implementations:
- * Browser tab title notification of cumulative number of unread private messages/hits on keywords.
- * ^-> These only proc if the browser window tab is out of focus or the private message tab is out of focus.
- * Added a local syntax helpfile for every command.
- * Added a help command, which lists all the commands currently implemented in F-Chat 2.0.
- *
- * Refactorization/Optimization.
- * Completely redone parsing/handling of commands.
- */
+              ///////////////////////////////////////////////REVISIONS//////////////////////////////////////////////////////////
+             //<FEATURES>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
+            // -->PM logs now use acct_toUser syntax when stored to localStorage so they only display per-character to avoid//
+           //    public computers that have multiple fchat users to see someone else's conversations. Oh my!               //
+          // -->PM log settings preferences are partitioned from the truncate settings.                                   //
+         // -->Added a setting to allow the user to use a highlight on tab activity instead of flash.                    //
+        // -->Cookie usage has been depreciated for the use of HTML5's localStorage in its place.                       //
+       //    These are still accessible under their old string id.                                                     //
+      //    i.e: 'FList.Common_getCookie("chat_settings")' is the same as 'localStorage["chat_settings"]'             //
+     //    Setting localStorage only requires a prop and a value, it is indefinite.                                  //
+    //   (2)i.e: 'localStorage["chat_settings"]=JSON.stringify(data);'                                              //
+   //<VARIOUS FIXES>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
+  // -->Fixed the pin-removal bug when users softly log out of the game (not a full disconnect)                   //
+ //    This was caused by toggling the pins on tabs that were already open. (and forgetting pins on logout)      //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WEB_SOCKET_SWF_LOCATION = "../WebSocket.swf";WEB_SOCKET_DEBUG = false;
-
-var focus; /**@define {Boolean} focus Global window focus variable*/
 
 $(function () {
 
@@ -78,27 +75,27 @@ FList.Chat = {
     },
 
     processMessage: function(_tabtype, _msgtype, _message){//todo: truncate, collapse. etc.
-        if (FList.Chat.Settings.current.autoParseURLs === true) _message = _message.replace(/(?:[^=\]]|^)((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/g, "[url]$1[/url]");
+        if (FList.Chat.Settings.current.autoParseURLs == true) _message = _message.replace(/(?:[^=\]]|^)((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/g, "[url]$1[/url]");
         return FList.ChatParser.parseContent(_message);
     },
 
     rebuildChannelsTab: function(_type,_sort, _order){
 
-        if(_type==="public"){
+        if(_type=="public"){
             $(".chatui-tab-channels .public").html("");
-            if(_sort==="label"){
-                FList.Chat.publicChannels = FList.Chat.publicChannels.sort(function (a, b){ if (a.title === b.title) return 0; return a.title < b.title ? 1 : -1; });
+            if(_sort=="label"){
+                FList.Chat.publicChannels = FList.Chat.publicChannels.sort(function (a, b){ if (a.title == b.title) return 0; return a.title < b.title ? 1 : -1; });
                 $(".channels-tab-label span.sort:first").removeClass("list-item-important channel-sort-reverse");
                  $(".channels-tab-label span.label:first").addClass("list-item-important");
-                 if(_order==="reverse") $(".channels-tab-label span.label:first").addClass("channel-sort-reverse"); else $(".channels-tab-label span.label:first").removeClass("channel-sort-reverse");
+                 if(_order=="reverse") $(".channels-tab-label span.label:first").addClass("channel-sort-reverse"); else $(".channels-tab-label span.label:first").removeClass("channel-sort-reverse");
             }
-            if(_sort==="users"){
-                FList.Chat.publicChannels = FList.Chat.publicChannels.sort(function (a, b){ if (a.users === b.users) return 0; return a.users > b.users ? 1 : -1; });
+            if(_sort=="users"){
+                FList.Chat.publicChannels = FList.Chat.publicChannels.sort(function (a, b){ if (a.users == b.users) return 0; return a.users > b.users ? 1 : -1; });
                 $(".channels-tab-label span.label:first").removeClass("list-item-important channel-sort-reverse");
                 $(".channels-tab-label span.sort:first").addClass("list-item-important");
-                 if(_order==="reverse") $(".channels-tab-label span.sort:first").addClass("channel-sort-reverse"); else $(".channels-tab-label span.sort:first").removeClass("channel-sort-reverse");
+                 if(_order=="reverse") $(".channels-tab-label span.sort:first").addClass("channel-sort-reverse"); else $(".channels-tab-label span.sort:first").removeClass("channel-sort-reverse");
             }
-            if(_order==="reverse") FList.Chat.publicChannels.reverse();
+            if(_order=="reverse") FList.Chat.publicChannels.reverse();
             $.each(FList.Chat.publicChannels, function(i,pc){
                 $(".chatui-tab-channels .public").append('<div class="list-item channel-item panel list-highlight" id="user5"><span class="count">' + pc.users + '</span><span class="name">' + pc.title + '</span></div>');
                 var tab=FList.Chat.TabBar.getTabFromId("channel", pc.id);
@@ -117,24 +114,24 @@ FList.Chat = {
                     }
                 });
             });
-            $(".channels-tab-label span.sort:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "users", _order==="default" ? "reverse"  : "default"); });
-            $(".channels-tab-label span.label:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "label", _order==="default" ? "reverse"  : "default"); });
+            $(".channels-tab-label span.sort:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "users", _order=="default" ? "reverse"  : "default"); });
+            $(".channels-tab-label span.label:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "label", _order=="default" ? "reverse"  : "default"); });
         }
-        if(_type==="private"){
+        if(_type=="private"){
             $(".chatui-tab-channels .private").html("");
-            if(_sort==="label"){
-                FList.Chat.privateChannels = FList.Chat.privateChannels.sort(function (a, b){ if (a.title === b.title) return 0; return a.title < b.title ? 1 : -1; });
+            if(_sort=="label"){
+                FList.Chat.privateChannels = FList.Chat.privateChannels.sort(function (a, b){ if (a.title == b.title) return 0; return a.title < b.title ? 1 : -1; });
                 $(".channels-tab-label span.sort:last").removeClass("list-item-important channel-sort-reverse");
                  $(".channels-tab-label span.label:last").addClass("list-item-important");
-                 if(_order==="reverse") $(".channels-tab-label span.label:last").addClass("channel-sort-reverse"); else $(".channels-tab-label span.label:last").removeClass("channel-sort-reverse");
+                 if(_order=="reverse") $(".channels-tab-label span.label:last").addClass("channel-sort-reverse"); else $(".channels-tab-label span.label:last").removeClass("channel-sort-reverse");
             }
-            if(_sort==="users"){
-                FList.Chat.privateChannels = FList.Chat.privateChannels.sort(function (a, b){ if (a.users === b.users) return 0; return a.users > b.users ? 1 : -1; });
+            if(_sort=="users"){
+                FList.Chat.privateChannels = FList.Chat.privateChannels.sort(function (a, b){ if (a.users == b.users) return 0; return a.users > b.users ? 1 : -1; });
                 $(".channels-tab-label span.label:last").removeClass("list-item-important channel-sort-reverse");
                 $(".channels-tab-label span.sort:last").addClass("list-item-important");
-                if(_order==="reverse") $(".channels-tab-label span.sort:last").addClass("channel-sort-reverse"); else $(".channels-tab-label span.sort:last").removeClass("channel-sort-reverse");
+                if(_order=="reverse") $(".channels-tab-label span.sort:last").addClass("channel-sort-reverse"); else $(".channels-tab-label span.sort:last").removeClass("channel-sort-reverse");
             }
-            if(_order==="reverse") FList.Chat.privateChannels.reverse();
+            if(_order=="reverse") FList.Chat.privateChannels.reverse();
             $.each(FList.Chat.privateChannels, function(i,pc){
                 $(".chatui-tab-channels .private").append('<div class="list-item channel-item panel list-highlight" id="user5"><span class="count">' + pc.users + '</span><span class="name">' + pc.title + '</span></div>');
                 var tab=FList.Chat.TabBar.getTabFromId("channel", pc.id);
@@ -153,18 +150,18 @@ FList.Chat = {
                     }
                 });
             });
-            $(".channels-tab-label span.sort:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "users", _order==="default" ? "reverse"  : "default"); });
-            $(".channels-tab-label span.label:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "label", _order==="default" ? "reverse"  : "default"); });
+            $(".channels-tab-label span.sort:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "users", _order=="default" ? "reverse"  : "default"); });
+            $(".channels-tab-label span.label:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "label", _order=="default" ? "reverse"  : "default"); });
         }
 
 
     },
 
     openPrivateChat: function(name, dounescape){
-        if(name.toLowerCase()===FList.Chat.identity.toLowerCase()) return;
-        if (dounescape === true) name = unescape(name);
+        if(name.toLowerCase()==FList.Chat.identity.toLowerCase()) return;
+        if (dounescape == true) name = unescape(name);
         var tab=FList.Chat.TabBar.getTabFromId("user",name);
-        if(tab===false){
+        if(tab==false){
             FList.Chat.TabBar.addTab("user",name,name.toLowerCase());
             tab=FList.Chat.TabBar.getTabFromId("user",name);
             FList.Chat.Activites.flash(tab.tab,255,255,255,300);
@@ -180,11 +177,11 @@ FList.Chat = {
     if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
 },
 openChannelChat: function(channel, dounescape){
-    if (dounescape === true) channel = unescape(channel);
+    if (dounescape == true) channel = unescape(channel);
     var channeldata=FList.Chat.channels.getData(channel);
     if(!channeldata.created) FList.Chat.channels.create(channel, channel);
     var tab=FList.Chat.TabBar.getTabFromId("channel",channel);
-    if(tab===false){
+    if(tab==false){
         FList.Chat.TabBar.addTab("channel",channel,channel);
         tab=FList.Chat.TabBar.getTabFromId("channel",channel);
         FList.Chat.Activites.flash(tab.tab,255,255,255,300);
@@ -218,7 +215,7 @@ FList.Chat.Settings = {
         if( typeof(Storage) !== "undefined" && localStorage["chat_settings"]===undefined ) localStorage["chat_settings"]=FList.Common_getCookie("chat_settings");
         //
         var settingsString=localStorage["chat_settings"];
-        if(settingsString==="") FList.Chat.Settings.current=FList.Chat.Settings.defaults;
+        if(settingsString=="") FList.Chat.Settings.current=FList.Chat.Settings.defaults;
         else FList.Chat.Settings.current=JSON.parse(settingsString);
     },
     getPanel: function(){
@@ -273,7 +270,7 @@ FList.Chat.Settings = {
         var tabsOnTheSide=$(".ui-settings-tabsontheside:checked").length>0 ? true : false;
         var highlightWords=$(".ui-settings-highlightwords").val().split(" ");
         var flashTabIndicate=$(".ui-settings-flashTabIndicate:checked").length>0 ? true : false;
-        if(highlightWords[0]==="") highlightWords=[];
+        if(highlightWords[0]=="") highlightWords=[];
         FList.Chat.Settings.current.fontSize=fontSize;
         FList.Chat.Settings.current.visibleLines=visibleLines;
         FList.Chat.Settings.current.disableIconTag=disableIconTag;
@@ -311,7 +308,7 @@ FList.Chat.Settings = {
 
     apply: function(){
         $("#chat-content-chatarea, #info-bar").css("font-size", FList.Chat.Settings.current.fontSize + "px");//apply fontSize
-        FList.Chat.TabBar.printLogs(FList.Chat.TabBar.activeTab, FList.Chat.TabBar.activeTab.type ==="channel" ? FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id).userMode : "both");//apply visibleLines
+        FList.Chat.TabBar.printLogs(FList.Chat.TabBar.activeTab, FList.Chat.TabBar.activeTab.type =="channel" ? FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id).userMode : "both");//apply visibleLines
         if(FList.Chat.Settings.current.disableIconTag){
             FList.ChatParser.addCustomTag("icon", false, function(content) {
             var cregex = /^[a-zA-Z0-9_\-\s]+$/;
@@ -337,7 +334,7 @@ FList.Chat.Settings = {
             });
         }
 
-        if(FList.Chat.TabBar.activeTab.type==="channel"){
+        if(FList.Chat.TabBar.activeTab.type=="channel"){
             if(FList.Chat.Settings.current.disableUserList) FList.Chat.UserBar.hide();
             else FList.Chat.UserBar.show();
         }
@@ -391,9 +388,7 @@ FList.Chat.Status = {
     },
 
     set: function(status, message){
-        FList.Chat.printMessage({msg: 'Your status was set to ' + (((status === 'Crown') ? 'Cookie': status) +
-                                ((message.length > 0) ? ', "' + FList.Chat.Input.sanitize(message) + '"' : '')),
-                                from: 'System', type: 'system'});
+        FList.Chat.printMessage("Your status was set to " + (status=="Crown"?"Cookie":status) + (message.length>0 ? ", \"" + FList.Chat.Input.sanitize(message) + "\"" : ""), FList.Chat.TabBar.activeTab.type, FList.Chat.TabBar.activeTab.id, "System", "exact", "system", true);
         if(status!=="Idle"){
             this.lastStatus.status=status.toLowerCase();
         }
@@ -510,21 +505,21 @@ FList.Chat.isChatop = function(){
 };
 
 FList.Chat.isChatop = function(user){
-    if(user===undefined) user = FList.Chat.identity;
+    if(user==undefined) user = FList.Chat.identity;
     var result = false;
     $.each(FList.Chat.opList, function(index, value) {
-        if (result === false && value.toLowerCase() === user.toLowerCase())
+        if (result == false && value.toLowerCase() == user.toLowerCase())
             result = true;
-    });
+    })
     return result;
 };
 
 FList.Chat.isSubscribed = function(){
-    return parseInt($("#iss").val())===1;
+    return parseInt($("#iss").val())==1;
 };
 
 FList.Chat.isChanop = function(channel, user) {
-    if(user===undefined) user = FList.Chat.identity;
+    if(user==undefined) user = FList.Chat.identity;
     var tab  = FList.Chat.TabBar.getTabFromId("channel", channel);
     if (tab.type !== "channel") return false;
     if (FList.Chat.isChatop()) return true;
@@ -536,7 +531,7 @@ FList.Chat.isChanOwner = function() {
     if (FList.Chat.isChatop()) return true;
     var chanops = FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id).oplist;
     if(chanops.length<1) return false;
-    return FList.Chat.identity === chanops[0];
+    return FList.Chat.identity == chanops[0];
 };
 
 FList.Chat.getPrintClasses = function(name, channel){
@@ -546,14 +541,14 @@ FList.Chat.getPrintClasses = function(name, channel){
     classstring+=" Status" + userdata.status;
     if (jQuery.inArray(name.toLowerCase(), FList.Chat.ignoreList) !== -1) classstring+=" AvatarBlocked";
     if(jQuery.inArray(name, FList.Chat.friendsList)!==-1) classstring+=" AvatarFriend";
-    if(channel===false){
+    if(channel==false){
         if(jQuery.inArray(name,FList.Chat.opList)!==-1) classstring+=" OpLink";
         //todo: friend, block.
     } else {
         var channeldata=FList.Chat.channels.getData(channel);
-        if(channeldata.owner===name) classstring+=" ChanOwnerLink";
+        if(channeldata.owner==name) classstring+=" ChanOwnerLink";
         if(jQuery.inArray(name,FList.Chat.opList)!==-1 && channeldata.owner!==name) classstring+=" OpLink";
-        if(jQuery.inArray(name,channeldata.oplist)!==-1 && jQuery.inArray(name,FList.Chat.opList)===-1 && channeldata.owner!==name) classstring+=" ChanOpLink";
+        if(jQuery.inArray(name,channeldata.oplist)!==-1 && jQuery.inArray(name,FList.Chat.opList)==-1 && channeldata.owner!==name) classstring+=" ChanOpLink";
         //todo: friend, block.
     }
     return classstring;
@@ -575,7 +570,7 @@ FList.Chat.UserBar = new function UserBar() {
     this.updateUser = function(name){
         name=name.toLowerCase();
         if($("#user-bar span[rel='" + name + "']").length>0){
-            if($("#user-bar .section-ops span[rel='" + name + "']").length===0){//if not in the op list
+            if($("#user-bar .section-ops span[rel='" + name + "']").length==0){//if not in the op list
                 FList.Chat.UserBar.removeUser(name);
                 FList.Chat.UserBar.insertSorted(name);
             } else {
@@ -590,7 +585,7 @@ FList.Chat.UserBar = new function UserBar() {
         var isFriend=(jQuery.inArray(user, FList.Chat.friendsOnline)!==-1) || (jQuery.inArray(user, FList.Chat.bookmarksOnline)!==-1);
         var target=$("#user-bar .section-default");
         var linkclasses=FList.Chat.getPrintClasses(user, FList.Chat.TabBar.activeTab.id);
-        if(user===channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
+        if(user==channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
             html="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'><span class='rank'></span>" + user + "</span>";
             target=$("#user-bar .section-ops");
         } else if(isFriend){
@@ -622,7 +617,7 @@ FList.Chat.UserBar = new function UserBar() {
             $("#user-view-avatars").addClass("list-item-important");
         else
             $("#user-view-default").addClass("list-item-important");
-        if(FList.Chat.TabBar.activeTab.type==="channel"){
+        if(FList.Chat.TabBar.activeTab.type=="channel"){
             var channeldata=FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id);
             var users=channeldata.userlist.sort(function (a, b) {
                 var x = a.replace(/[^a-z0-9]/gi,'').toLowerCase();
@@ -631,7 +626,7 @@ FList.Chat.UserBar = new function UserBar() {
             });//sort();
             $("#user-view-avatars").html(users.length + '');
 
-            $("#user-bar .user-bar-content").html(users.length===0 ? "&nbsp;" : "");
+            $("#user-bar .user-bar-content").html(users.length==0 ? "&nbsp;" : "");
             var ophtml="";
             var html="";
             var friendhtml="";
@@ -639,7 +634,7 @@ FList.Chat.UserBar = new function UserBar() {
             $.each(users, function(i, user){
                 var isFriend=(jQuery.inArray(user, FList.Chat.friendsOnline)!==-1) || (jQuery.inArray(user, FList.Chat.bookmarksOnline)!==-1);
                 var linkclasses=FList.Chat.getPrintClasses(user, FList.Chat.TabBar.activeTab.id);
-                if(user===channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
+                if(user==channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
                     ophtml+="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'><span class='rank'></span>" + user + "</span>";
                 } else if(isFriend){
                         friendhtml+="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'>" + user + "</span>";
@@ -668,24 +663,24 @@ FList.Chat.UserBar = new function UserBar() {
     };
 };
 
-FList.Chat.TypingArea = function TypingArea() {
+FList.Chat.TypingArea = new function TypingArea() {
 
     this.create = function(){
         $("#message-field").keydown(function(e){
             $(".autocompletelink").each(function(i, el){ $(this).replaceWith($(this).text()); });
-            if(e.which===9 && !e.ctrlKey){
+            if(e.which==9 && !e.ctrlKey){
                 e.preventDefault();
                 FList.Chat.AutoComplete.complete();
             }
             FList.Chat.TypeState.update();
             FList.Chat.TypingArea.indicate();
-            if(e.which===38 && e.ctrlKey) { e.stopPropagation();FList.Chat.TabBar.tabToTheLeft(); }
-            if(e.which===40 && e.ctrlKey) { e.stopPropagation();FList.Chat.TabBar.tabToTheRight(); }
+            if(e.which==38 && e.ctrlKey) { e.stopPropagation();FList.Chat.TabBar.tabToTheLeft(); }
+            if(e.which==40 && e.ctrlKey) { e.stopPropagation();FList.Chat.TabBar.tabToTheRight(); }
         });
         $("#message-field").keypress(function(e){
             FList.Chat.TypeState.update();
             FList.Chat.TypingArea.indicate();
-            if(e.which===13 && !(e.shiftKey || e.ctrlKey)){
+            if(e.which==13 && !(e.shiftKey || e.ctrlKey)){
                 e.preventDefault();
                 FList.Chat.Input.handle($("#message-field").val());
             }
@@ -709,15 +704,15 @@ FList.Chat.TypingArea = function TypingArea() {
         var curlength=$("#message-field").val().length;
         var maxlength=0;
         var type=FList.Chat.TabBar.activeTab.type;
-        maxlength=type==="channel" ? parseInt(FList.Chat.serverVars["chat_max"]) : parseInt(FList.Chat.serverVars["priv_max"]);
-        if(type==="console") maxlength=1024;
+        maxlength=type=="channel" ? parseInt(FList.Chat.serverVars["chat_max"]) : parseInt(FList.Chat.serverVars["priv_max"]);
+        if(type=="console") maxlength=1024;
         var percent=parseInt((curlength/maxlength)*100);
         $("#typing-indicator").css("height", parseInt((maxheight/100)*percent) + 'px');
         if(percent>95 && percent<100){
             $("#typing-indicator").css("background-color", '#f26d30');
         } else if(percent>90 && percent <=95){
             $("#typing-indicator").css("background-color", '#f2f252');
-        } else if (percent===100){
+        } else if (percent==100){
             $("#typing-indicator").css("background-color", '#aa2032');
         } else {
             $("#typing-indicator").css("background-color", '#000000');
@@ -728,7 +723,7 @@ FList.Chat.TypingArea = function TypingArea() {
 FList.Chat.InfoBar = new function InfoBar() {
 
     this.update = function(){
-        if(FList.Chat.TabBar.activeTab.type==="channel"){
+        if(FList.Chat.TabBar.activeTab.type=="channel"){
             if(FList.Rights.has("admin") || FList.Rights.has("chat-chatop") || FList.Chat.isChanop(FList.Chat.TabBar.activeTab.id, FList.Chat.identity)){
                 $("#info-bar-channel").show();
                 if(!FList.Chat.isChanOwner() && !FList.Rights.has("admin") && !FList.Rights.has("chat-chatop")){
@@ -739,14 +734,14 @@ FList.Chat.InfoBar = new function InfoBar() {
             }
             var data=FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id);
             var chanlink=$('<a class="ChannelLink">' + data.title + '</a>');
-            if(FList.Chat.TabBar.activeTab.id.toLowerCase().substring(0,4)==="adh-") chanlink=$('<a class="SessionLink">' + data.title + '</a>');
+            if(FList.Chat.TabBar.activeTab.id.toLowerCase().substring(0,4)=="adh-") chanlink=$('<a class="SessionLink">' + data.title + '</a>');
             $("#info-bar-actions").html(chanlink);
             $("#info-bar-actions").append("<br/><div class='actions'><input type='radio' value='both' id='showboth' name='showmode' checked='checked' /><label for='showboth'>Both</label><input type='radio' id='showchat' name='showmode' value='chat'/><label for='showchat'>Chat</label><input type='radio' id='showads' name='showmode' value='ads'/><label for='showads'>Ads</label></div>");
             $("#info-bar-actions .actions").buttonset();
             $("#info-bar-actions .actions input").attr("disabled",false);
             $("#show" + data.userMode).attr("checked", true);
-            if(data.mode==="chat") $("#showads, #showboth").attr("disabled",true);
-            if(data.mode==="ads") $("#showchat, #showboth").attr("disabled",true);
+            if(data.mode=="chat") $("#showads, #showboth").attr("disabled",true);
+            if(data.mode=="ads") $("#showchat, #showboth").attr("disabled",true);
             $("input[name='showmode']").change(function(event){
                 data.userMode=$(this).val().toLowerCase();
                 FList.Chat.TabBar.printLogs(FList.Chat.TabBar.activeTab, data.userMode);
@@ -754,8 +749,8 @@ FList.Chat.InfoBar = new function InfoBar() {
             $("#info-bar-actions .actions input").button("refresh");
             $("#info-bar-actions a").css("white-space","nowrap").click(function(){ FList.Chat.openChannelChat(FList.Chat.TabBar.activeTab.id, false); });
             $("#info-bar-main > div").html(data.joined ? FList.ChatParser.parseContent(data.description) : data.title);
-            if(data.joined===false) $("#info-bar-main > div").append("<br/><b>This room no longer exists or is not joined.</b>");
-        } else if(FList.Chat.TabBar.activeTab.type==="user"){
+            if(data.joined==false) $("#info-bar-main > div").append("<br/><b>This room no longer exists or is not joined.</b>");
+        } else if(FList.Chat.TabBar.activeTab.type=="user"){
             $("#info-bar-channel").hide();
             var data=FList.Chat.users.getData(FList.Chat.TabBar.activeTab.id);
             var classes=FList.Chat.getPrintClasses(data.name, false);
@@ -767,7 +762,7 @@ FList.Chat.InfoBar = new function InfoBar() {
             $("#info-bar-flist").button({ text: false, icons: { primary: "ui-icon-person" }
             }).click(function(){ window.open(domain + "c/" + data.name.toLowerCase() + "/"); });
             $("#info-bar-actions .actions").buttonset();
-            $("#info-bar-main > div").html((data.status==="Crown" ? "Cookie" : data.status) + (data.statusmsg!=="" ? (", " + FList.ChatParser.parseContent(data.statusmsg)) : ""));
+            $("#info-bar-main > div").html((data.status=="Crown" ? "Cookie" : data.status) + (data.statusmsg!=="" ? (", " + FList.ChatParser.parseContent(data.statusmsg)) : ""));
         } else {
             $("#info-bar-channel").hide();
             $("#info-bar-actions").html(FList.Chat.users.count + " users connected.");
@@ -806,7 +801,7 @@ FList.Chat.TabBar = new function TabBar() {
         html = "";
         logs = [];//grab last amount of visible logs
         FList.Chat.Logs.Draw(tab.id,tab);
-        $("#chat-content-chatarea > div").html(tab.logs.length===0 ? "&nbsp;" : "");
+        $("#chat-content-chatarea > div").html(tab.logs.length==0 ? "&nbsp;" : "");
         if(tab.logs.length>0){
             cutoff=tab.logs.length>=FList.Chat.Settings.current.visibleLines ? tab.logs.length-FList.Chat.Settings.current.visibleLines : 0;
             for(var i = tab.logs.length-1;i>=cutoff;i--){
@@ -814,9 +809,9 @@ FList.Chat.TabBar = new function TabBar() {
             }
             logs.reverse();//fix order
             $.each(logs, function(i, log){
-                if(mode==="chat") {
+                if(mode=="chat") {
                     if(log.type!=="ad") html+=log.html;
-                } else if(mode==="ads"){
+                } else if(mode=="ads"){
                     if(log.type!=="chat" && log.type!=="rp") html+=log.html;
                 } else {
                     html+=log.html;
@@ -827,56 +822,45 @@ FList.Chat.TabBar = new function TabBar() {
         }
     };
 
-    this.setActive = function (_type, _id) {
-
+    this.setActive = function(_type, _id){
         if(this.activeTab!==false){
             FList.Chat.TypeState.check(true);
-            if(this.activeTab.type==="channel" && _type!=="channel") FList.Chat.UserBar.hide();
-            if(this.activeTab.type!=="channel" && _type==="channel" && !FList.Chat.Settings.current.disableUserList) FList.Chat.UserBar.show();
+            if(this.activeTab.type=="channel" && _type!=="channel") FList.Chat.UserBar.hide();
+            if(this.activeTab.type!=="channel" && _type=="channel" && !FList.Chat.Settings.current.disableUserList) FList.Chat.UserBar.show();
         }
-
         var tab=this.getTabFromId(_type, _id);
         tab.pending=0;
         tab.mentions=0;
         FList.Chat.Activites.noIndicate(tab.tab);
         $(".tab-item").removeClass("list-item-important");
         tab.tab.addClass("list-item-important");
-
         if(this.activeTab!==false){
             this.activeTab.textfield=$("#message-field").val();
             $("#message-field").val(tab.textfield);
         }
-
         this.activeTab=tab;
-
-        if(tab.type==="channel"){
+        if(tab.type=="channel"){
             $("#message-field").attr("maxlength",parseInt(FList.Chat.serverVars["chat_max"]));
             $("#typing-send-actions").html("<input type='button' class='send-input-choice send-input-chat' value='Send Chat'><input type='button' class='send-input-choice send-input-ad' value='Send Ad'>");
-            if(FList.Chat.channels.getData(_id).mode==="ads") $(".send-input-chat").attr("disabled", true);
-            if(FList.Chat.channels.getData(_id).mode==="chat") $(".send-input-ad").attr("disabled", true);
-        } else if(tab.type==="user"){
+            if(FList.Chat.channels.getData(_id).mode=="ads") $(".send-input-chat").attr("disabled", true);
+            if(FList.Chat.channels.getData(_id).mode=="chat") $(".send-input-ad").attr("disabled", true);
+        } else if(tab.type=="user"){
             $("#message-field").attr("maxlength",parseInt(FList.Chat.serverVars["priv_max"]));
             $("#typing-send-actions").html("<input type='button' class='send-input-single send-input-chat' value='Send Chat'>");
         } else {
             $("#message-field").attr("maxlength",1024);
             $("#typing-send-actions").html("<input type='button' class='send-input-single send-input-chat' value='Send Chat'>");
         }
-
         $("#typing-send-actions input").button();
         $(".send-input-chat").click(function(){ FList.Chat.Input.handle($("#message-field").val()); });
         $(".send-input-ad").click(function(){ FList.Chat.Roleplay.sendAd(FList.Chat.TabBar.activeTab.id, $("#message-field").val()); });
-        this.printLogs(tab, _type ==="channel" ? FList.Chat.channels.getData(_id).userMode : "both");
-        if(_type==="channel") FList.Chat.UserBar.renderTheWholeFuckingThing(FList.Chat.userListMode);
+        this.printLogs(tab, _type =="channel" ? FList.Chat.channels.getData(_id).userMode : "both");
+        if(_type=="channel") FList.Chat.UserBar.renderTheWholeFuckingThing(FList.Chat.userListMode);
         FList.Chat.InfoBar.update();
         if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
         FList.Chat.TypingArea.indicate();
         FList.Chat.TypingArea.update();
-        FList.Chat.Roleplay.update(_type==="channel" ? _id : "");
-
-        if (_id.toLowerCase() in FList.Window.Notice.tabTally) {
-            FList.Window.Notice.readMsg(_id.toLowerCase());
-        }
-
+        FList.Chat.Roleplay.update(_type=="channel" ? _id : "");
     };
 
     this.loadSavedTabs = function(){
@@ -887,12 +871,12 @@ FList.Chat.TabBar = new function TabBar() {
         if(savestring!=="" || FList.Chat.restoreTabs.length>0){//if there are saved tabs:
             var savedata=JSON.parse(savestring);
             $.each(savedata, function(i,save){
-                if(save.type==="channel"){
+                if(save.type=="channel"){
                     FList.Chat.openChannelChat(save.id, false);
                     var channel=FList.Chat.channels.getData(save.id);
                     channel.title=save.title;
                 }
-                if(save.type==="user") FList.Chat.openPrivateChat(save.title, false);
+                if(save.type=="user") FList.Chat.openPrivateChat(save.title, false);
                 if(FList.Chat.TabBar.getTabFromElement(FList.Chat.TabBar.getTabFromId(save.type, save.id).tab).pinned){
                     FList.Chat.TabBar.getTabFromId(save.type, save.id).tab.children(".pin").addClass("pin-enabled");
                 } else {
@@ -900,14 +884,12 @@ FList.Chat.TabBar = new function TabBar() {
                 }
             });
             $.each(FList.Chat.restoreTabs, function(i,restore){ //if you got logged out, disconnected, etc, restore the tabs that were open just now. IF you log in with the same user.
-                if(restore.type==="channel"){
+                if(restore.type=="channel"){
                     FList.Chat.openChannelChat(restore.id, false);
                 }
-                if(restore.type==="user") FList.Chat.openPrivateChat(restore.id, false);
+                if(restore.type=="user") FList.Chat.openPrivateChat(restore.id, false);
             });
             FList.Chat.restoreTabs=[];
-        } else {//if not, load default tabs
-            FList.Chat.openChannelChat("Frontpage",false);
         }
     };
 
@@ -917,8 +899,8 @@ FList.Chat.TabBar = new function TabBar() {
             var tab=$(this);
             var tabdata=FList.Chat.TabBar.getTabFromElement(tab);
             if(!tabdata.closed && tabdata.pinned){
-                if(tabdata.type==="user") { savedata.push({"type":tabdata.type,"id":tabdata.id,"title":FList.Chat.users.getData(tabdata.id).name});}
-                if(tabdata.type==="channel"){
+                if(tabdata.type=="user") { savedata.push({"type":tabdata.type,"id":tabdata.id,"title":FList.Chat.users.getData(tabdata.id).name});}
+                if(tabdata.type=="channel"){
 
                     if(tabdata.id.toLowerCase()!=="adh-staffroomforstaffppl" && tabdata.id.toLowerCase()!=="adh-uberawesomestaffroom"){
                         savedata.push({"type":tabdata.type,"id":tabdata.id,"title":FList.Chat.channels.getData(tabdata.id).name});
@@ -932,9 +914,9 @@ FList.Chat.TabBar = new function TabBar() {
     this.tabToTheLeft = function(){
         var tab=false;var lastTab=false;
         $("#tab-bar > div").children().each(function(){
-            if(tab!==false  && FList.Chat.TabBar.getTabFromElement(tab).closed===false) lastTab=tab;
+            if(tab!==false  && FList.Chat.TabBar.getTabFromElement(tab).closed==false) lastTab=tab;
             tab=$(this);
-            if(FList.Chat.TabBar.activeTab.tab[0]===tab[0]) return false;
+            if(FList.Chat.TabBar.activeTab.tab[0]==tab[0]) return false;
         });
         if(lastTab!==false){
             var tabdata=FList.Chat.TabBar.getTabFromElement(lastTab);
@@ -946,8 +928,8 @@ FList.Chat.TabBar = new function TabBar() {
         var tab=false;var found=false;
         $("#tab-bar > div").children().each(function(){
             tab=$(this);
-            if(found  && FList.Chat.TabBar.getTabFromElement(tab).closed===false) return false;
-            if(FList.Chat.TabBar.activeTab.tab[0]===tab[0]) found=true;
+            if(found  && FList.Chat.TabBar.getTabFromElement(tab).closed==false) return false;
+            if(FList.Chat.TabBar.activeTab.tab[0]==tab[0]) found=true;
         });
         if(found){
             var tabdata=FList.Chat.TabBar.getTabFromElement(tab);
@@ -968,7 +950,7 @@ FList.Chat.TabBar = new function TabBar() {
         };
         $("#tab-bar > div").mouseenter(function(e) {
             e.preventDefault();
-            if (FList.Chat.TabBar.scrollInterval) return;
+            if (FList.Chat.TabBar.scrollInterval != null) return;
             FList.Chat.TabBar.scrollInterval = setInterval(FList.Chat.TabBar.scrollFunction, 20);
         });
         $("#tab-bar > div").mouseleave(function(e) {
@@ -1009,7 +991,7 @@ FList.Chat.TabBar = new function TabBar() {
         var found=false;
         _id=_id.toLowerCase();
         $.each(this.list, function(i, item){
-            if(item.type===_type && item.id.toLowerCase()===_id){
+            if(item.type==_type && item.id.toLowerCase()==_id){
                 found=item;
                 return false;
             }
@@ -1030,7 +1012,7 @@ FList.Chat.TabBar = new function TabBar() {
     this.getTabFromElement = function(el){
         var found=false;
         $.each(this.list, function(i, item){
-            if(item.tab[0]===el[0]){
+            if(item.tab[0]==el[0]){
                 found=item;
                 return false;
             }
@@ -1048,9 +1030,9 @@ FList.Chat.TabBar = new function TabBar() {
 
     this.addTab = function(_type, _title, _id){
         var tabEl=$("<div></div>");
-        if(_type==="user") tabEl.append("<a class='tpn' style='display:none;'></a>");
+        if(_type=="user") tabEl.append("<a class='tpn' style='display:none;'></a>");
         if(_type!=="console") {
-            if(!((_id.toLowerCase()==="adh-staffroomforstaffppl" || _id.toLowerCase()==="adh-uberawesomestaffroom") && _type==="channel")){
+            if(!((_id.toLowerCase()=="adh-staffroomforstaffppl" || _id.toLowerCase()=="adh-uberawesomestaffroom") && _type=="channel")){
                 tabEl.append("<a class='pin'></a>");
                 tabEl.children(".pin").mousedown(function(e){
                     e.stopPropagation();
@@ -1067,20 +1049,19 @@ FList.Chat.TabBar = new function TabBar() {
         }
         tabEl.addClass("panel list-highlight tab-item tab-type-" + _type);
         if(_type!=="console") tabEl.addClass("tab-item-sortable");
-        if(_type==="user") tabEl.append("<img src='" + staticdomain + "images/avatar/" + _id.toLowerCase() + ".png'/>");
-        if(_type==="channel") tabEl.append("<img src='" + staticdomain + "images/icons/" + (_type==="channel" && _id.toLowerCase().substring(0,4)==="adh-" ? "key.png" : "hash.png") + "'/>");
-        if(_type==="console") tabEl.append("<img src='" + staticdomain + "images/icons/console.png'/>");
+        if(_type=="user") tabEl.append("<img src='" + staticdomain + "images/avatar/" + _id.toLowerCase() + ".png'/>");
+        if(_type=="channel") tabEl.append("<img src='" + staticdomain + "images/icons/" + (_type=="channel" && _id.toLowerCase().substring(0,4)=="adh-" ? "key.png" : "hash.png") + "'/>");
+        if(_type=="console") tabEl.append("<img src='" + staticdomain + "images/icons/console.png'/>");
         this.list.push(new FList.Chat.Tab(tabEl, _type, _id));
         FList.Chat.TabBar.updateTooltip(this.getTabFromId(_type, _id));
         $("#tab-bar > div").append(tabEl);
         tabEl.mousedown(function(){ FList.Chat.TabBar.setActive(_type,_id); });
         FList.Chat.TabBar.makeSortable();
     };
-
     this.closeTab = function(el){
         var tabdata=this.getTabFromElement(el);
-        if(FList.Chat.TabBar.activeTab.type===tabdata.type && FList.Chat.TabBar.activeTab.id===tabdata.id) this.tabToTheLeft();
-        if(tabdata.type==="channel") {
+        if(FList.Chat.TabBar.activeTab.type==tabdata.type && FList.Chat.TabBar.activeTab.id==tabdata.id) this.tabToTheLeft();
+        if(tabdata.type=="channel") {
             var channeldata=FList.Chat.channels.getData(tabdata.id);
             if(channeldata.joined){
                 FList.Connection.send("LCH " + JSON.stringify({ "channel": tabdata.id }));
@@ -1088,18 +1069,8 @@ FList.Chat.TabBar = new function TabBar() {
                 this.removeTab(tabdata.type, tabdata.id);
             }
         }
-
-        if(tabdata.type==="user") {
-            this.removeTab(tabdata.type, tabdata.id);
-
-        }
-
-        if (tabdata.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
-                FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
-        }
+        if(tabdata.type=="user") this.removeTab(tabdata.type, tabdata.id);
     };
-
     this.removeTab = function(_type, _id){
         var tab=this.getTabFromId(_type, _id);
         FList.Chat.Activites.noIndicate(tab.tab);
@@ -1112,10 +1083,9 @@ FList.Chat.TabBar = new function TabBar() {
         lastClose=tab;
         $("#header-fchat").FlexMenu("item-enable", "mnu-tab-undo");
     };
-
     this.undoClose = function(){
         if(lastClose!==false){
-            if(lastClose.type==="channel") FList.Chat.openChannelChat(lastClose.id, false);
+            if(lastClose.type=="channel") FList.Chat.openChannelChat(lastClose.id, false);
             else FList.Chat.openPrivateChat(lastClose.id, false);
             lastClose=false;
             $('#Notice').hide();
@@ -1138,14 +1108,14 @@ FList.Chat.TabBar = new function TabBar() {
         if(tab!==false){
             var title=tab.id;
             var content="";
-            if(tab.type==="channel"){
+            if(tab.type=="channel"){
                 var channeldata=FList.Chat.channels.getData(tab.id);
                 title=channeldata.title;
                 content=channeldata.description;
                 if(content.length>255) content=content.substring(0,255) + " (...)";
                 content = FList.ChatParser.parseContent(content.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ '' +'$2'));
             }
-            if(tab.type==="user"){
+            if(tab.type=="user"){
                 var userdata=FList.Chat.users.getData(tab.id);
                 var tab=FList.Chat.TabBar.getTabFromId("user", tab.id);
                 if(tab!==false){
@@ -1154,7 +1124,7 @@ FList.Chat.TabBar = new function TabBar() {
                     content = FList.ChatParser.parseContent(content.replace(/\[icon\].*\[\/icon\]/g, ""));
                 }
             }
-            if(tab.type==="console"){
+            if(tab.type=="console"){
                 title="Console";
                 content="You are looking at the console. Developers: To enable raw output of F-Chat network activity in the console, set FList.Chat.debug to true.";
             }
@@ -1163,208 +1133,132 @@ FList.Chat.TabBar = new function TabBar() {
     };
 };
 
-/**
- * Print message on tab's window buffer.
- *
- * @param {{msg:String, [to]:Object, from:String, type:String, [log]:*}} args
- * Optional arguments will be allotted with the current active tab (to) and logging (persistence) will be true by default.
- */
-FList.Chat.printMessage = function(args){
-    var scrollDown=false,
-        highlight=false,
-        isDefault = (!args.to || args.to === {} ||
-                    args.to.id.toLowerCase() === this.TabBar.activeTab.id.toLowerCase()) ?
-                        true: false,
-        classList = "chat-message chat-type-" + args.type,
-        tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
-        ct = new Date(),
-        time = ct.getHours() + ":" +
-               (ct.getMinutes() < 10 ? "0" + ct.getMinutes(): ct.getMinutes()) +
-               " " + (ct.getHours() > 11 ? "PM" : "AM"),
-        regx,
-        avatarclasses,
-        html = "",
-        tab,
-        showmode,
-        display;
-
-    args.to = (isDefault) ? this.TabBar.activeTab: args.to;
-
-    args.log = (args.log === undefined) ? true: args.log;
-
-    if (!args.from || !args.msg || !args.type) {
-        throw "Mandatory arguments missing on printMessage call.";
-    }
-
-    if (args.from === this.identity) {
-        classList += " chat-type-own";
-    }
-
-    if ($("#chat-content-chatarea > div").prop("scrollTop") >=
-       ($("#chat-content-chatarea > div").prop("scrollHeight") -
-        $('#chat-content-chatarea > div').height()) - 50) {
-            scrollDown=true;
-    }
-
-    if(args.msg.substring(0, 6) === "/warn " && args.to.type === "channel") {
-        if (jQuery.inArray(args.from, this.opList) !== -1 ||
-            jQuery.inArray(args.from, this.channels.getData(args.to.id).oplist) !== -1) {
-                args.msg = args.msg.substring(6);
-                classList += " chat-type-warn";
+FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _messagetype, _log){
+    var scrollDown=false;
+    var highlight=false;
+    var classList="chat-message chat-type-" + _messagetype;
+    if(_origin==FList.Chat.identity) classList +=" chat-type-own";
+    if($("#chat-content-chatarea > div").prop("scrollTop")>=($("#chat-content-chatarea > div").prop("scrollHeight")- $('#chat-content-chatarea > div').height() )-50) scrollDown=true;
+    var ct = new Date();
+    var time=ct.getHours() + ":" + (ct.getMinutes() < 10 ? "0" + ct.getMinutes() : ct.getMinutes()) + " " + (ct.getHours() > 11 ? "PM" : "AM");
+    if(_message.substring(0,6)=="/warn " && _type=="channel"){
+    if(jQuery.inArray(_origin,FList.Chat.opList)!==-1 || jQuery.inArray(_origin,FList.Chat.channels.getData(_id).oplist)!== -1){
+            _message=_message.substring(6);
+            classList+=" chat-type-warn";
         }
     }
-
-    args.msg = this.processMessage(args.to.type, args.type, args.msg);
-
-    if (this.Settings.current.highlightMentions &&
-       (args.type === "chat" || args.type !== "ad" || args.type !== "rp")) {
-
-            for (i = 0; i < this.Settings.current.highlightWords; ++i) {
-                regx = new RegExp("\\b" +
-                                this.Settings.current.highlightWords[i] +
-                                "('s)?\\b", "i");
-
-                if (regx.test(args.msg) && args.from !== this.identity &&
-                    args.to.type === "channel") {
-                        highlight = true;
-                }
-
-            }
-
-            regx = new RegExp("\\b" + this.identity + "('s)?\\b", "i");
-
-            if (!highlight && regx.test(args.msg) &&
-                this.from !== this.identity && args.to.type === "channel") {
-                    highlight = true;
-            }
-
+    _message=FList.Chat.processMessage(_type, _messagetype, _message);
+    if(FList.Chat.Settings.current.highlightMentions && (_messagetype=="chat" || _messagetype!=="ad" || _messagetype!=="rp")){
+        $.each(FList.Chat.Settings.current.highlightWords, function(i, word){
+            var wordreg = new RegExp("\\b" + word + "('s)?\\b", "i");
+            if(wordreg.test(_message) && _origin!==FList.Chat.identity && _type=="channel") highlight=true;
+        });
+        var identreg = new RegExp("\\b" + FList.Chat.identity + "('s)?\\b", "i");
+        if(!highlight && identreg.test(_message) && _origin!==FList.Chat.identity && _type=="channel") highlight=true;
     }
+    if(highlight) classList+=" chat-type-mention";
+    var html="";
+    var avatarclasses=FList.Chat.getPrintClasses(_origin, _type=="channel" ? _id : false);
+    if(_messagetype!=="chat" && _messagetype!=="ad" && _messagetype!=="rp") avatarclasses="";
+    if(_messagetype=="rp") html="<div class='" + classList + "'><span class='timestamp'>[" + time + "]</span> <i><span class='" + avatarclasses + "'><span class='rank'></span>" + _origin + "</span>" + _message + "</i></div>";
+    if(_messagetype=="chat" || _messagetype=="error" || _messagetype=="system" || _messagetype=="ad") html="<div class='" + classList + "'><span class='timestamp'>[" + time + "]</span> <span class='" + avatarclasses + "'><span class='rank'></span>" + _origin + "</span>: " + _message + "</div>";
+    var tab=FList.Chat.TabBar.getTabFromId(_type,_id);
+    var showmode=_type=="channel" ? FList.Chat.channels.getData(_id).userMode : "both";
+    var display=((showmode=="ads" && (_messagetype=="chat" || _messagetype=="rp")) || (showmode=="chat" && _messagetype=="ad")) ? false : true;
 
-    if (highlight) {
-        classList += " chat-type-mention";
-    }
-
-    avatarclasses = this.getPrintClasses(args.from,
-                                        ((args.to.type === "channel") ? args.to.id: false));
-
-    if (args.type !== "chat" && args.type !== "ad" && args.type !== "rp") {
-        avatarclasses = "";
-    }
-
-    if (args.type === "rp") {
-        html = "<div class='" + classList + "'><span class='timestamp'>[" +
-                time + "]</span> <i><span class='" + avatarclasses +
-                "'><span class='rank'></span>" + args.from + "</span>" +
-                args.msg + "</i></div>";
-    }
-
-    if (args.type === "chat" || args.type === "error" || args.type === "system" ||
-        args.type === "ad") {
-            html = "<div class='" + classList + "'><span class='timestamp'>[" +
-                    time + "]</span> <span class='" + avatarclasses +
-                    "'><span class='rank'></span>" + args.from + "</span>: " +
-                    args.msg + "</div>";
-    }
-
-    tab = this.TabBar.getTabFromId(args.to.type, args.to.id);
-
-    showmode = (args.to.type === "channel") ? this.channels.getData(args.to.id).userMode: "both";
-
-    display = ((showmode === "ads" && (args.type === "chat" || args.type === "rp")) ||
-                (showmode==="chat" && args.type === "ad")) ? false: true;
-
-    if (isDefault) {
-
-            if (display) {
-
-                if (!tab.logs.length) {
-                    $("#chat-content-chatarea > div").html("");
-                }
-
-                $("#chat-content-chatarea > div").append(html);
-
-                if (scrollDown) {
-                    this.scrollDown();
-                }
-
-                this.truncateVisible();
-
-            }
-
-    }
-    if (!isDefault || !this.focused) {
-
-            if (args.to.type === "channel") {
-                if (display) {
-                    tab.pending+=1;
-                    if (highlight) {
-                        tab.mentions += 1;
-
-                        if (this.Settings.current.html5Audio) {
-                            FList.Chat.Sound.playSound("attention");
-                        }
-
-                        if (this.Settings.current.html5Notifications) {
-                            this.Notifications.message("A word/name was highlighted,  by " + args.from +
-                                                       " in " + args.to.id, args.msg.substring(0,100), staticdomain +
-                                                       "images/avatar/" + args.from.toLowerCase() + ".png",
-                                                       function(){
-                                                            FList.Chat.TabBar.setActive(args.to.type, args.to.id);
-                                                       });
-                        }
-
-                    }
-
-                }
-
-            }
-
-            if (args.to.type === "user") {
-
-                if (args.type === "chat" || args.type === "rp") {
-                    tab.mentions += 1;
-
-                    if (this.Settings.current.html5Audio) {
-                        this.Sound.playSound("attention");
-                    }
-
-                    if (this.Settings.current.html5Notifications) {
-                        this.Notifications.message("You received a private message from " +
-                                                   args.from, args.msg.substring(0,100), staticdomain + "images/avatar/" +
-                                                   args.from.toLowerCase() + ".png",
-                                                   function() {
-                                                       FList.Chat.TabBar.setActive(args.to.type, args.to.id);
-                                                   });
-                    }
-
-                } else {
-                    tab.pending += 1;
-                }
-
-            }
-
-    }
-
-    if (args.log) {
-        tab.logs.push({"type": args.type ,"by": args.from, "html": html});
-
-        if(!this.Settings.current.enableLogging){
-
-            if(tab.logs.length > this.Settings.current.visibleLines) {
-                tab.logs.shift();
-            }
-
+    if(FList.Chat.TabBar.activeTab.type==_type && FList.Chat.TabBar.activeTab.id.toLowerCase()==_id.toLowerCase()){
+        if(display){
+            if(tab.logs.length==0) $("#chat-content-chatarea > div").html("");
+            $("#chat-content-chatarea > div").append(html);
+            if(scrollDown) FList.Chat.scrollDown();
+            FList.Chat.truncateVisible();
         }
-
     }
+    if(FList.Chat.TabBar.activeTab.type!==_type || FList.Chat.TabBar.activeTab.id.toLowerCase()!==_id.toLowerCase() || !FList.Chat.focused){
+        if(_type=="channel"){
+            if(display){
+                tab.pending+=1;
+                    if(highlight){
+                        tab.mentions+=1;
+                        if(FList.Chat.Settings.current.html5Audio) FList.Chat.Sound.playSound("attention");
+                        if(FList.Chat.Settings.current.html5Notifications) FList.Chat.Notifications.message("A word/name was highlighted,  by " + _origin + " in " + _id, _message.substring(0,100), staticdomain + "images/avatar/" + _origin.toLowerCase() + ".png", function(){FList.Chat.TabBar.setActive(_type,_id);});
+                    }
 
+            }
+        }
+        if(_type=="user"){//pm ping
+            if(_messagetype=="chat" || _messagetype=="rp"){
+                tab.mentions+=1;
+                if(FList.Chat.Settings.current.html5Audio) FList.Chat.Sound.playSound("attention");
+                if(FList.Chat.Settings.current.html5Notifications) FList.Chat.Notifications.message("You received a private message from " + _origin, _message.substring(0,100), staticdomain + "images/avatar/" + _origin.toLowerCase() + ".png", function(){FList.Chat.TabBar.setActive(_type,_id);});
+            } else {
+                tab.pending+=1;
+            }
+        }
+    }
+    if(_log){
+        tab.logs.push({"type": _messagetype ,"by": _origin, "html": html});
+        if(!FList.Chat.Settings.current.enableLogging){
+            if(tab.logs.length>FList.Chat.Settings.current.visibleLines) tab.logs.shift();
+        }
+    }
     FList.Chat.Logs.Store(tab);
+};
 
-    if (args.from.toLowerCase() !== "system" &&
-        (args.to.type === "user" || highlight) &&
-        (!focus || tabFocus !== args.to.id.toLowerCase())) {
-            FList.Window.Notice.newMsg(args.to.id.toLowerCase());
+FList.Chat.Roleplay = {
+    timer: 0,
+
+    isRoleplay: function(message){ return (message.substring(0,4)=="/me " || message.substring(0,4)=="/me'") ? true : false; },
+
+    sendAd: function(channel, message){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        if(this.canPost(channel)<=0){
+            this.setPosted(channel);
+            if(jQuery.trim(message).length>0){
+                if(FList.Chat.Settings.current.html5Audio) FList.Chat.Sound.playSound("chat");
+                FList.Connection.send("LRP " + JSON.stringify({ "channel": channel, "message": message }));
+                FList.Chat.printMessage(FList.Chat.Input.sanitize(message), "channel", channel, FList.Chat.identity, "exact", "ad", true);
+                $("#message-field").val("");
+            } else {
+                FList.Common_displayError("You didn't enter a message.");
+            }
+        } else {
+            FList.Common_displayError("You have to wait " + (this.canPost(channel)/1000) + " seconds before you can post another ad here.");
+        }
+    },
+
+    timerClock: function(channel){
+        this.update(channel);
+    },
+
+    setPosted: function(channel){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        tab.lastAd = new Date().getTime();
+        this.update(channel);
+        clearTimeout(FList.Chat.Roleplay.timer);
+        FList.Chat.Roleplay.timer=setTimeout(function(){ FList.Chat.Roleplay.timerClock(channel); }, FList.Chat.serverVars["lfrp_flood"] * 1000);
+    },
+
+    canPost: function(channel){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        var remaining = parseInt(tab.lastAd-(new Date().getTime() - FList.Chat.serverVars["lfrp_flood"] * 1000));
+        return remaining>0 ? remaining : 0;
+    },
+
+    //tab switch
+    update: function(channel){
+        clearTimeout(FList.Chat.Roleplay.timer);
+        if(FList.Chat.TabBar.activeTab.type!=="channel") return;
+        if(FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id).mode=="chat") return;
+        if(this.canPost(channel)>0){
+            $(".send-input-ad").attr("disabled", true);
+            $(".send-input-ad").addClass("Busy").css({"background-repeat":"no-repeat","background-position":"left center"});
+            FList.Chat.Roleplay.timer=setTimeout(function(){ FList.Chat.Roleplay.timerClock(channel); }, this.canPost(channel)+1000);
+        } else {
+            $(".send-input-ad").button("enable").removeClass("Busy").removeAttr("style");
+        }
     }
+
 
 };
 
@@ -1396,8 +1290,8 @@ FList.Chat.Activites = {
 
     indicate: function(){
         $.each(FList.Chat.TabBar.list, function(i, item){
-            if(item.closed===false){
-                if(item.pending>0 && item.mentions===0) FList.Chat.Activites.flash(item.tab, 123, 137, 34, 1000);
+            if(item.closed==false){
+                if(item.pending>0 && item.mentions==0) FList.Chat.Activites.flash(item.tab, 123, 137, 34, 1000);
                 if(item.mentions>0) FList.Chat.Activites.flash(item.tab, 168, 31, 168, 1000);
             }
         });
@@ -1409,10 +1303,10 @@ FList.Chat.Sound = {
     sounds: [],
     init: function(){
         var audiotest=document.createElement('audio');
-        if(typeof(Audio) === "function" && audiotest.canPlayType){
+        if(typeof(Audio) == "function" && audiotest.canPlayType){
             FList.Chat.Sound.audiosupport="wav"
-            if(("no" !== audiotest.canPlayType("audio/mpeg")) && ("" !== audiotest.canPlayType("audio/mpeg"))) FList.Chat.Sound.audiosupport="mp3";
-            if(FList.Chat.Sound.audiosupport!="mp3" && ("no" != audiotest.canPlayType("audio/ogg")) && ("" !== audiotest.canPlayType("audio/ogg"))) FList.Chat.Sound.audiosupport="ogg";
+            if(("no" != audiotest.canPlayType("audio/mpeg")) && ("" != audiotest.canPlayType("audio/mpeg"))) FList.Chat.Sound.audiosupport="mp3";
+            if(FList.Chat.Sound.audiosupport!="mp3" && ("no" != audiotest.canPlayType("audio/ogg")) && ("" != audiotest.canPlayType("audio/ogg"))) FList.Chat.Sound.audiosupport="ogg";
             var pth= staticdomain + "sound/";
             var ext=FList.Chat.Sound.audiosupport;
             FList.Chat.Sound.sounds=[{id:"login","file":new Audio(pth + 'login.' + ext)},{id:"newnote","file":new Audio(pth + 'newnote.' + ext)}, {id:"attention","file":new Audio(pth + 'attention.' + ext)},{id:"chat","file":new Audio(pth + 'chat.' + ext)},{id:"system","file":new Audio(pth + 'system.' + ext)},{id:"modalert","file":new Audio(pth + 'modalert.' + ext)},{id:"logout","file":new Audio(pth + 'logout.' + ext)}];
@@ -1421,9 +1315,9 @@ FList.Chat.Sound = {
     playSound : function(soundname){
         if(FList.Chat.Sound.audiosupport!=="none") {
             $.each(FList.Chat.Sound.sounds,function(i,snd){
-                if(snd.id===soundname) snd.file.play();
+                if(snd.id==soundname) snd.file.play();
             });
-        }
+        };
     }
 };
 
@@ -1435,7 +1329,7 @@ FList.Chat.Notifications = {
     },
     message: function(title, message, image, callback){
         if(window.webkitNotifications){
-            if(window.webkitNotifications.checkPermission() === 0){
+            if(window.webkitNotifications.checkPermission() == 0){
                 var instance=window.webkitNotifications.createNotification(image,title, message.substr(0,100));
                 instance.onclick = function() {
                     callback();
@@ -1457,11 +1351,11 @@ FList.Chat.TypeState = {
     update: function() {
         if (FList.Chat.TabBar.activeTab.type !== "user") return;
         FList.Chat.TabBar.activeTab.typetime = new Date().getTime();
-        if (FList.Chat.TabBar.activeTab.mewaiting === true) {
+        if (FList.Chat.TabBar.activeTab.mewaiting == true) {
             FList.Chat.TabBar.activeTab.mewaiting = false;
             return;
         }
-        if (FList.Chat.TabBar.activeTab.metyping === false && $("#message-field").val().length > 0) {
+        if (FList.Chat.TabBar.activeTab.metyping == false && $("#message-field").val().length > 0) {
             FList.Chat.TabBar.activeTab.metyping = true;
             FList.Connection.send("TPN " + JSON.stringify({ character: FList.Chat.TabBar.activeTab.id, status: "typing" }));
         }
@@ -1469,10 +1363,10 @@ FList.Chat.TypeState = {
     check: function(force) {
         var minTypeTime = new Date().getTime() - FList.Chat.typingInterval * 1000 + 10;
         if (FList.Chat.TabBar.activeTab.type !== "user") return;
-        if (force === true || (FList.Chat.TabBar.activeTab.typetime < minTypeTime && FList.Chat.TabBar.activeTab.metyping === true)) {
+        if (force == true || (FList.Chat.TabBar.activeTab.typetime < minTypeTime && FList.Chat.TabBar.activeTab.metyping == true)) {
             FList.Chat.TabBar.activeTab.metyping = false;
             var tst = "paused";
-            if ($("#message-field").val().length === 0) tst = "clear";
+            if ($("#message-field").val().length == 0) tst = "clear";
             FList.Connection.send("TPN " + JSON.stringify({ character: FList.Chat.TabBar.activeTab.id, status: tst }));
         }
     }
@@ -1498,11 +1392,11 @@ FList.Chat.IdleTimer = {
         }
     },
     reset: function(){
-        if(FList.Chat.Settings.current.autoIdle && FList.Chat.IdleTimer.idle===false){
+        if(FList.Chat.Settings.current.autoIdle && FList.Chat.IdleTimer.idle==false){
             FList.Chat.IdleTimer.disable();
             FList.Chat.IdleTimer.enable();
         }
-        if(FList.Chat.IdleTimer.idle===true){
+        if(FList.Chat.IdleTimer.idle==true){
             FList.Chat.IdleTimer.idle=false;
             FList.Chat.Status.restore();//restore old status
         }
@@ -1515,34 +1409,32 @@ FList.Chat.AutoComplete = {
         complete: function(){
             var matches=FList.Chat.AutoComplete.findMatches(true);
             var matches2=FList.Chat.AutoComplete.findMatches(false);
-            if(matches===-1 && matches2===-1) {
+            if(matches==-1 && matches2==-1) {
                 FList.Common_displayError("Too short to autocomplete.");
             } else {
-                if(matches === -1) matches=[];
-                if(matches2===-1) matches2=[];
+                if(matches==-1) matches=[];
+                if(matches2==-1) matches2=[];
                 var names=[];
                 $.each(matches, function(key,match){ names.push(match["name"]); });
-                $.each(matches2, function(key,match){ if(jQuery.inArray(match["name"],names)===-1) matches.push(match); });
+                $.each(matches2, function(key,match){ if(jQuery.inArray(match["name"],names)==-1) matches.push(match); });
                 if(matches.length>1){
                     var matchstring="";
                     for(var i in matches){
                         matchstring=matchstring+"<a href='#' class='autocompletelink' onclick=\"FList.Chat.AutoComplete.completeName(" + matches[i]["start"] + ", '"+matches[i]["name"] + "', '"+ $("#message-field").val() + "');\">"+matches[i]["name"] + "</a>, ";
                     }
-                    FList.Chat.printMessage({msg: 'Several matches found: ' +
-                                            matchstring.substring(0,matchstring.length-2),
-                                            from: 'System', type: 'system'});
-                } else if(matches.length===1){
+                    FList.Chat.printMessage("Several matches found: " + matchstring.substring(0,matchstring.length-2), FList.Chat.TabBar.activeTab.type, FList.Chat.TabBar.activeTab.id, "System", "exact", "system", true);
+                } else if(matches.length==1){
                     FList.Chat.AutoComplete.completeName(matches[0]["start"], matches[0]["name"], $("#message-field").val());
                 } else {
-                    FList.Chat.printMessage({msg: 'No matches found.', from: 'System', type: 'system'});
+                    FList.Chat.printMessage("No matches found.", FList.Chat.TabBar.activeTab.type, FList.Chat.TabBar.activeTab.id, "System", "exact", "system", true);
                 }
             }
             if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
         },
 
         completeName: function(startpos, name, fulltext){
-            if(startpos===0){ name=name + " "; }
-            if(fulltext.substr(startpos, 1)===" " || fulltext.substr(startpos, 1)==="\""){ startpos++; }
+            if(startpos==0){ name=name + " "; }
+            if(fulltext.substr(startpos, 1)==" " || fulltext.substr(startpos, 1)=="\""){ startpos++; }
             var endpos=startpos+name.length;
             fulltext=fulltext.substring(0, startpos) + name + fulltext.substring(endpos);
             $("#message-field").val(fulltext);
@@ -1556,32 +1448,32 @@ FList.Chat.AutoComplete = {
             for(var i=endpos;i>=0;i--){
                 var character=text.substr(i,1);
                 startpos=i;
-                if(character===" ") {
+                if(character==" ") {
                     if(skipspaces){
                         break;
                     } else {
                         scount=scount+1;
-                        if(scount===2) break;//allow one space.
+                        if(scount==2) break;//allow one space.
                     }
                 }
-                if(character==="\"") break;
+                if(character=="\"") break;
             }
             var completetext=text.substring(startpos, endpos).toLowerCase();
-            if(completetext.substring(0,1)===" " || completetext.substring(0,1)==="\"")
+            if(completetext.substring(0,1)==" " || completetext.substring(0,1)=="\"")
                 completetext=completetext.substring(1);
             if(completetext.length<=1){
                 return -1;
             } else {
                 var list=FList.Chat.users.list;
-                var match=[];
+                var match=new Array();
                 var matches=0;
                 for(var i in list){
-                    if(list[i].toLowerCase().substring(0,completetext.length)===completetext){
+                    if(list[i].toLowerCase().substring(0,completetext.length)==completetext){
                         match.push({"name": list[i], "start": startpos, "search": completetext});
                         matches++;
                     }
                 }
-                if(matches===0) return [];
+                if(matches==0) return [];
                 else return match;
             }
         }
@@ -1607,12 +1499,10 @@ FList.Chat.staffAlert = {
                     var reportUser=alertdialog.find(".ui-report-user").val();
                     var logs="";
                     logs = JSON.stringify(FList.Chat.TabBar.activeTab.logs);
-                    FList.Chat.printMessage({msg: 'Hang on, the chat is uploading your chat log...',
-                                            from: 'System', type: 'system'});
+                    FList.Chat.printMessage("Hang on, the chat is uploading your chat log...", FList.Chat.TabBar.activeTab.type, FList.Chat.TabBar.activeTab.id, "System", "exact", "system", true);
                     jQuery.post("https://" + window.location.host + "/fchat/submitLog.php", { character: FList.Chat.identity, log: logs, reportText: reportText, reportUser: reportUser, channel: FList.Chat.TabBar.activeTab.id  }, function(data) {
-                        if (typeof(data.log_id) != "string" || parseInt(data.log_id) === 0) {
-                            FList.Chat.printMessage({msg: 'Error uploading your chat log. Mod alert aborted.',
-                                                    from: 'System', type: 'error'});
+                        if (typeof(data.log_id) != "string" || parseInt(data.log_id) == 0) {
+                            FList.Chat.printMessage("Error uploading your chat log. Mod alert aborted.", FList.Chat.TabBar.activeTab.type, FList.Chat.TabBar.activeTab.id, "System", "exact", "error", true);
                             return;
                         }
                         var report = "Current Tab/Channel: " + FList.Chat.TabBar.activeTab.id + " | Reporting User: " + reportUser + " | " + reportText;
@@ -1620,7 +1510,7 @@ FList.Chat.staffAlert = {
                         call.action = "report";
                         call.character = FList.Chat_identity;
                         call.report = report;
-                        if (typeof(parseInt(data.log_id)) === "number") call.logid = parseInt(data.log_id);
+                        if (typeof(parseInt(data.log_id)) == "number") call.logid = parseInt(data.log_id);
                         FList.Connection.send("SFC " + JSON.stringify(call));
                         alertdialog.dialog("close");
 
@@ -1639,7 +1529,7 @@ FList.Chat.Logs = {
         var lsArray,x,acct,acctStr;
         acct = FList.Chat.identity;
         acctStr = acct+"_"+uid;
-        if( tab.type==="user" && tab.hasRendered === undefined && (typeof(Storage)!=="undefined") && FList.Chat.Settings.current.enablePMLogging === true ){
+        if( tab.type=="user" && tab.hasRendered === undefined && (typeof(Storage)!=="undefined") && FList.Chat.Settings.current.enablePMLogging === true ){
             tab.hasRendered = true;
             if(localStorage[acctStr] !== undefined){
                 lsArray = localStorage[acctStr].split(",");
@@ -1661,7 +1551,7 @@ FList.Chat.Logs = {
     },
     Delete: function(){
         if(typeof(Storage)!==undefined){
-            for(var i in localStorage){
+            for(i in localStorage){
                 if(i.match(/_last/gi)){
                     delete localStorage[i];
                     delete localStorage[(i.replace("_last",""))];
@@ -1670,12 +1560,11 @@ FList.Chat.Logs = {
         }
     },
     Store: function(tab){
-        if( tab.type==="user" && typeof(Storage)!==undefined && FList.Chat.Settings.current.enablePMLogging === true &&tab.logs[(tab.logs.length-1)]["by"] !== "System"){
-            var lsArray,uid,acct,acctStr,time,x,y,m;
+        if( tab.type=="user" && typeof(Storage)!==undefined && FList.Chat.Settings.current.enablePMLogging === true &&tab.logs[(tab.logs.length-1)]["by"] !== "System"){
+            var lsArray,uid,acct,acctStr,time,x,y;
             acct = FList.Chat.identity;
             x = new Date();
             y = (x.getDate()<10) ? "0"+x.getDate(): x.getDate();
-            m = ((x.getMonth()+1)<10) ? "0"+(x.getMonth()+1): (x.getMonth()+1);
             time = Math.floor((new Date()).getTime()/1000);
             uid = tab.id;
             acctStr = acct+"_"+uid;
@@ -1686,28 +1575,28 @@ FList.Chat.Logs = {
                 }
 
                 if(tab.hasRendered === undefined){
-                    if(tab.localLogsOffset !== undefined){
+                    if(tab.localLogsOffset != undefined){
                         tab.localLogsOffset = tab.localLogsOffset+1;
                     }else{
                         tab.localLogsOffset = 1;
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(x.getFullYear()-2000)+"$3"))) +","+ lsArray.join());
+                localStorage[acctStr] = (escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+x.getMonth()+1+"/"+(x.getFullYear()-2000)+"$3"))) +","+ lsArray.join());
             } else {
                 if(tab.hasRendered === undefined){
-                    if(tab.localLogsOffset !== undefined){
+                    if(tab.localLogsOffset != undefined){
                         tab.localLogsOffset = tab.localLogsOffset+1;
                     }else{
                         tab.localLogsOffset = 1;
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(x.getFullYear()-2000)+"$3")));
+                localStorage[acctStr] = escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+x.getMonth()+1+"/"+(x.getFullYear()-2000)+"$3")));
             }
             if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
             if(parseInt(localStorage["nextPreen"])<time){
-                for(var prop in localStorage){
+                for(prop in localStorage){
                     if(prop.match(/_last/gi)){
                         if((parseInt(localStorage[prop])+604800)<=time){
                             delete localStorage[prop];
@@ -1727,8 +1616,8 @@ FList.Chat.Logs = {
         var zip = new JSZip();
         $.each(FList.Chat.TabBar.list, function(i,tab){
             var tabname=tab.id;
-            if(tab.type==="channel") tabname=FList.Chat.channels.getData(tab.id).title;
-            if(tab.type==="user") tabname=FList.Chat.users.getData(tab.id).name;
+            if(tab.type=="channel") tabname=FList.Chat.channels.getData(tab.id).title;
+            if(tab.type=="user") tabname=FList.Chat.users.getData(tab.id).name;
             var valid_filename = tabname.replace(/[^a-zA-Z \-_0-9]+/g,'');
             zip.add(valid_filename+".html", FList.Chat.Logs.getLogDocument(tab));
         });
@@ -1738,114 +1627,24 @@ FList.Chat.Logs = {
     },
     getLogDocument: function(tab){
         var tabname=tab.id;
-        if(tab.type==="channel") tabname=FList.Chat.channels.getData(tab.id).title;
-        if(tab.type==="user") tabname=FList.Chat.users.getData(tab.id).name;
+        if(tab.type=="channel") tabname=FList.Chat.channels.getData(tab.id).title;
+        if(tab.type=="user") tabname=FList.Chat.users.getData(tab.id).name;
         var doc = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
         + '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">\n'
         + '<head><title>F-list - Chat</title>\n'
         + '<style>\n'
         + 'h1{color:white;margin-bottom:10px;font-size:14pt;}\n'
         + 'body{background-color:#1F5284;font-family:verdana,helvetica;font-size:10pt;}\n'
-        + 'body{color:#FFFFFF;font-family:verdana,helvetica;font-size:10pt;}\n' +
-          '</style>\n' +
-          '</head>\n' +
-          '<body>\n' +
-          '<h1>F-Chat Log: ' + tabname + ', ' + new Date() + '</h1>\n' +
-          '<div id="LogContainer">\n';
+        + 'body{color:#FFFFFF;font-family:verdana,helvetica;font-size:10pt;}\n'
+        + '</style>\n'
+        + '</head>\n'
+        + '<body>\n'
+        + '<h1>F-Chat Log: ' + tabname + ', ' + new Date() + '</h1>\n'
+        + '<div id="LogContainer">\n';
         for (var l = 0; l < tab.logs.length; l++) {
             doc+=tab.logs[l].html;
         }
         doc += '</div></body></html>';
         return doc;
     }
-};
-
-/**
- * Adds a notification in the browser tab title that you have unread private messages.
- * If you wish to use this feature prior to it being pushed onto the 2.0 client live
- * just copy this code and paste it into your browser's console within the F-Chat tab.
- * Just keep in mind there could be minor bugs. Let me know if you find any.
- *
- * If you encounter any issues using this feature, you can remove it manually or
- * refresh your page to get rid of it. To manually remove this feature, open your browser's
- * console and delete the namespace associated with it by typing 'delete Kali' and pressing enter.
- *
- * Enjoy, and as always, have fun!
- *
- * @author Kali/Maw
- */
-
-FList.Window = {
-    Notice: {
-        tabTally: {}
-    }
-};
-
-var focus; /**@define {Boolean} focus Global window focus variable*/
-
-/**
- * Title draw function.
- */
-FList.Window.Notice.draw = function() {
-    document.title = '(' + this.tabTally.sum + ') F-list - Chat';
-};
-
-/**
- * Title tally function.
- * @param {string} tab Current tab ID
- */
-FList.Window.Notice.newMsg = function(tab) {
-
-    if (tab in this.tabTally) {
-        this.tabTally[tab] += 1;
-    } else {
-        this.tabTally[tab] = 1;
-    }
-
-    if (this.tabTally.sum) {
-        this.tabTally.sum += 1;
-    } else {
-        this.tabTally.sum = 1;
-    }
-
-    this.draw();
-};
-
-/**
- * On focus, subtract total unread messages from newly viewed tab from the title, then draw.
- * @param {string} tab Current tab ID
- */
-FList.Window.Notice.readMsg = function(tab) {
-
-    this.tabTally.sum -= this.tabTally[tab];
-
-    delete this.tabTally[tab];
-
-    if (this.tabTally.sum) {
-        this.draw();
-    } else {
-        delete this.tabTally.sum;
-        document.title = "F-list - Chat";
-    }
-
-};
-
-/**
- * Sets a global 'focus' variable, which sets a true/false value to check if the user is currently focused on this window.
- * Checks if on focus will allow the person to read backlogged notifications.
- */
-window.onfocus = function() {
-    focus = true;
-
-    if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
-    }
-};
-
-/**
- * Sets a global 'focus' variable
- */
-window.onblur = function() {
-    focus = false;
 };
