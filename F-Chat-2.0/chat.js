@@ -17,8 +17,6 @@
 
 WEB_SOCKET_SWF_LOCATION = "../WebSocket.swf";WEB_SOCKET_DEBUG = false;
 
-var focus; /**@define {Boolean} focus Global window focus variable*/
-
 $(function () {
 
     FList.ChatParser = new FList.BBParser();
@@ -1194,6 +1192,7 @@ FList.Chat.printMessage = function(args){
     args.log = (args.log === undefined) ? true: args.log;
 
     if (!args.from || !args.msg || !args.type) {
+        console.log(args);
         throw "Mandatory arguments missing on printMessage call.";
     }
 
@@ -1363,7 +1362,7 @@ FList.Chat.printMessage = function(args){
 
     if (args.from !== "System" &&
        (args.to.type === "user" || highlight) &&
-       (!focus || tabFocus !== args.to.id.toLowerCase())) {
+       (!wfocus || tabFocus !== args.to.id.toLowerCase())) {
             FList.tNotice.newMsg(args.to.id.toLowerCase());
     }
 
@@ -1775,11 +1774,11 @@ FList.Chat.Logs = {
  *
  * @author Kali/Maw
  */
-FList.tNotice: {
+FList.tNotice = {
     tabTally: {}
 };
 
-var focus; /**@define {Boolean} focus Global window focus variable*/
+var wfocus; /**@define {Boolean} focus Global window focus variable*/
 
 /**
  * Title draw function.
@@ -1829,11 +1828,11 @@ FList.tNotice.readMsg = function(tab) {
 };
 
 /**
- * Sets a global 'focus' variable, which sets a true/false value to check if the user is currently focused on this window.
- * Checks if on focus will allow the person to read backlogged notifications.
+ * Sets a global 'wfocus' variable, which sets a true/false value to check if the user is currently focused on this window.
+ * Checks if on wfocus will allow the person to read backlogged notifications.
  */
 window.onfocus = function() {
-    focus = true;
+    wfocus = true;
 
     if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
             FList.tNotice.tabTally) {
@@ -1842,8 +1841,8 @@ window.onfocus = function() {
 };
 
 /**
- * Sets a global 'focus' variable
+ * Sets a global 'wfocus' variable
  */
 window.onblur = function() {
-    focus = false;
+    wfocus = false;
 };

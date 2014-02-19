@@ -412,9 +412,6 @@ FList.Chat.commands['MSG'] = function (params) {
         message = message.substring(3);
         messagetype = "rp";
     }
-    console.log({msg: message,
-                to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
-                from: params.character, type: messagetype});
     FList.Chat.printMessage({msg: message,
                             to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                             from: params.character, type: messagetype});
