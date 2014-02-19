@@ -23,14 +23,14 @@ FList.tNotice.newMsg = function(tab) {
   } else {
     this.tabTally.sum = 1;
   }
-  return this.draw;
+  return this.draw();
 };
 
 FList.tNotice.readMsg = function(tab) {
   this.tabTally.sum -= this.tabTally.tab;
   delete this.tabTally.tab;
   if (this.tabTally.sum) {
-    return this.draw;
+    return this.draw();
   } else {
     delete this.tabTally.sum;
     return document.title = "F-list - Chat";

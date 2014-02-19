@@ -29,7 +29,7 @@ FList.tNotice.newMsg = (tab) ->
     else
         @tabTally.sum = 1
 
-    @draw
+    @draw()
 
 # On focus, subtract total unread messages from newly viewed tab from the title, then draw.
 # @param {string} tab Current tab ID
@@ -38,7 +38,7 @@ FList.tNotice.readMsg = (tab) ->
     delete this.tabTally.tab
 
     if @tabTally.sum
-        @draw
+        @draw()
     else
         delete @tabTally.sum
         document.title = "F-list - Chat"
