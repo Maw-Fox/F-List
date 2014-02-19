@@ -48,3 +48,126 @@ window.onfocus = function() {
 window.onblur = function() {
   return focus = false;
 };
+
+FList.Chat.printMessage = function(args) {
+  var avClasses, avatarClasses, classList, display, highlight, highlighted, html, isDefault, regx, scrollDown, showMode, showmode, tab, tabFocus, time, _i, _len, _ref;
+  scrollDown = false;
+  highlight = false;
+  isDefault = !args.to || args.to === {} || args.to.id.toLowerCase() === this.TabBar.activeTab.id.toLowerCase();
+  classList = "chat-message chat-type-" + args.type;
+  tabFocus = this.TabBar.activeTab.id.toLowerCase();
+  time = "" + (new Date().getHours()) + ":" + (new Date().getMinutes());
+  regx = new RegExp;
+  avClasses = "";
+  html = "";
+  tab = {};
+  showMode = "";
+  display = "";
+  args.to = isDefault ? this.TabBar.activeTab : args.to;
+  args.log = args.log ? true : false;
+  if (!args.from || !args.msg || !args.type) {
+    throw "Mandatory arguments missing on printMessage call.";
+  }
+  if (args.from === this.identity) {
+    classList += " chat-type-own";
+  }
+  if ($("#chat-content-chatarea > div").prop("scrollTop") >= ($("#chat-content-chatarea > div").prop("scrollHeight") - $('#chat-content-chatarea > div').height() - 50)) {
+    scrollDown = true;
+  }
+  if (args.msg.substring(0, 6) === "/warn " && args.to.type === "channel") {
+    if (this.opList.indexOf(args.from) !== -1 || this.channels.getData(args.to.id).oplist.indexOf(args.from) !== -1) {
+      args.msg = args.msg.substring(6);
+      classList += " chat-type-warn";
+    }
+  }
+  args.msg = this.processMessage(args.to.type, args.type, args.msg);
+  if (this.Settings.current.highlightMentions && args.type === "chat" || args.type !== "ad" || args.type !== "rp") {
+    _ref = this.Settings.current.highlightWords;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      highlighted = _ref[_i];
+      regx = new RegExp("\\b" + highlighted + "('s)?\\b", "i");
+      if (regx.test(args.msg) && args.from !== this.identity && args.to.type === "channel") {
+        highlight = true;
+        break;
+      }
+      regx = new RegExp("\\b" + this.identity + "('s)?\\b", "i");
+      if (regx.test(args.msg) && args.from !== this.identity && args.to.type === "channel") {
+        highlight = true;
+        break;
+      }
+    }
+  }
+  if (highlight) {
+    classList += " chat-type-mention";
+  }
+  avatarClasses = this.getPrintClasses(args.from, args.to.type === channel ? args.to.id : false);
+  if (args.type !== "chat" && args.type !== "ad" && args.type !== "rp") {
+    avatarClasses = "";
+  }
+  if (args.type === "rp") {
+    html = ("<div class=\"" + classList + "\"><span class='timestamp'>[" + time + "]</span> ") + ("<i><span class=\"" + avClasses + "\"><span class='rank'></span>") + ("" + args.from + "</span>" + args.msg + "</i></div>");
+  }
+  if (args.type === "chat" || args.type === "error" || args.type === "system" || ars.type === "ad") {
+    html = ("<div class=\"" + classList + "\"><span class=\"timestamp\">[" + time + "]") + ("</span> <span class=\"" + avCLasses + "\"><span class='rank'></span>") + ("" + args.from + "</span>: " + args.msg + "</div>");
+  }
+  tab = this.TabBar.getTabFromId(args.to.type, args.to.id);
+  showmode = args.to.type === "channel" ? this.channels.getData(args.to.id).userMode : "both";
+  display = (showmode === "ads" && (args.type === "chat" || args.type === "rp")) || (showmode === "chat" && args.type === "ad") ? false : true;
+  if (isDefault && display) {
+    if (!tab.logs.length) {
+      $("#chat-content-chatarea > div").html("");
+    }
+    $("#chat-content-chatarea > div").append(html);
+    if (!scrollDown) {
+      this.scrollDown();
+    }
+    this.truncateVisible();
+  }
+  if (!isDefault || !this.focused) {
+    if (args.to.type === "channel" && display) {
+      tab.pending++;
+      if (highlight) {
+        tab.mentions++;
+        if (this.Settings.current.html5Audio) {
+          this.Sound.playSound("attention");
+        }
+        if (this.Settings.current.html5Notifications) {
+          this.Notifications.message("A word/name was highlighted, by " + args.from + " in " + args.to.id, args.msg.substring(0, 100), "" + staticdomain + "images/avatar/" + (args.from.toLowerCase()) + ".png", function() {
+            return this.TabBar.setActive(args.to.type, args.to.id);
+          });
+        }
+      }
+      if (args.to.type === "user") {
+        if (args.type === "chat" || args.type === "rp") {
+          tab.mentions++;
+          if (this.Settings.current.html5Audio) {
+            this.Sound.playSound("attention");
+          }
+          if (this.Settings.current.html5Notifications) {
+            this.Notifications.message("You received a private message from " + args.from, args.msg.substring(0, 100), "" + staticdomain + "images/avatar/" + (args.from.toLowerCase()) + ".png", function() {
+              return this.TabBar.setActive(args.to.type, args.to.id);
+            });
+          }
+        } else {
+          tab.pending++;
+        }
+      }
+    }
+  }
+  if (args.log) {
+    tab.logs.push({
+      "type": args.type,
+      "by": args.from,
+      "html": html
+    });
+    if (!this.Settings.current.enableLogging) {
+      if (tab.logs.length > this.Settings.current.visibleLines) {
+        tab.logs.shift();
+      }
+    }
+  }
+  this.Logs.Store(tab);
+  if (args.from.toLowerCase() !== "system" && (args.type === "user" || highlight) && (!focus || tabFocus !== args.to.id.toLowerCase())) {
+    return FList.tNotice.newMsg(args.to.id.toLowerCase());
+  }
+};
