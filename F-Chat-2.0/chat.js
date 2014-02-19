@@ -1362,7 +1362,7 @@ FList.Chat.printMessage = function(args){
     FList.Chat.Logs.Store(tab);
 
     if (args.from !== "System" &&
-       (_type === "user" || highlight) &&
+       (args.type === "user" || highlight) &&
        (!focus || tabFocus !== args.to.id.toLowerCase())) {
             FList.tNotice.newMsg(args.to.id.toLowerCase());
     }
