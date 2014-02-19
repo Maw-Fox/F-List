@@ -13,10 +13,8 @@
  * @author Kali/Maw
  */
 
-FList.Window = {
-    Notice: {
-        tabTally: {}
-    }
+FList.tNotice = {
+    tabTally: {}
 };
 
 var focus; /**@define {Boolean} focus Global window focus variable*/
@@ -24,7 +22,7 @@ var focus; /**@define {Boolean} focus Global window focus variable*/
 /**
  * Title draw function.
  */
-FList.Window.Notice.draw = function() {
+FList.tNotice.draw = function() {
     document.title = '(' + this.tabTally.sum + ') F-list - Chat';
 };
 
@@ -32,7 +30,7 @@ FList.Window.Notice.draw = function() {
  * Title tally function.
  * @param {string} tab Current tab ID
  */
-FList.Window.Notice.newMsg = function(tab) {
+FList.tNotice.newMsg = function(tab) {
 
     if (tab in this.tabTally) {
         this.tabTally[tab] += 1;
@@ -53,7 +51,7 @@ FList.Window.Notice.newMsg = function(tab) {
  * On focus, subtract total unread messages from newly viewed tab from the title, then draw.
  * @param {string} tab Current tab ID
  */
-FList.Window.Notice.readMsg = function(tab) {
+FList.tNotice.readMsg = function(tab) {
 
     this.tabTally.sum -= this.tabTally[tab];
 
@@ -76,8 +74,8 @@ window.onfocus = function() {
     focus = true;
 
     if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
+            FList.tNotice.tabTally) {
+        FList.tNotice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
     }
 };
 
@@ -166,7 +164,7 @@ FList.Chat.printMessage = function(_message, _type, _id, _origin, _tab, _message
     if (_origin.toLowerCase() !== "system" &&
        (_type === "user" || highlight) &&
        (!focus || tabFocus !== _id.toLowerCase())) {
-            FList.Window.Notice.newMsg(_id.toLowerCase());
+            FList.tNotice.newMsg(_id.toLowerCase());
     }
 
 };
@@ -217,8 +215,8 @@ FList.Chat.TabBar.setActive = function (_type, _id) {
     FList.Chat.TypingArea.update();
     FList.Chat.Roleplay.update(_type==="channel" ? _id : "");
 
-    if (_id.toLowerCase() in FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(_id.toLowerCase());
+    if (_id.toLowerCase() in FList.tNotice.tabTally) {
+        FList.tNotice.readMsg(_id.toLowerCase());
     }
 
 };
@@ -241,8 +239,8 @@ FList.Chat.TabBar.closeTab = function(el){
     }
 
     if (tabdata.id.toLowerCase() in
-       FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
+       FList.tNotice.tabTally) {
+        FList.tNotice.readMsg(tabdata.id.toLowerCase());
     }
 
 };
