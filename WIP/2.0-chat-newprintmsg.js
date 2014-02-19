@@ -873,8 +873,8 @@ FList.Chat.TabBar = new function TabBar() {
         FList.Chat.TypingArea.update();
         FList.Chat.Roleplay.update(_type==="channel" ? _id : "");
 
-        if (_id.toLowerCase() in FList.Window.Notice.tabTally) {
-            FList.Window.Notice.readMsg(_id.toLowerCase());
+        if (_id.toLowerCase() in FList.tNotice.tabTally) {
+            FList.tNotice.readMsg(_id.toLowerCase());
         }
 
     };
@@ -1095,8 +1095,8 @@ FList.Chat.TabBar = new function TabBar() {
         }
 
         if (tabdata.id.toLowerCase() in
-           FList.Window.Notice.tabTally) {
-            FList.Window.Notice.readMsg(tabdata.id.toLowerCase());
+           FList.tNotice.tabTally) {
+            FList.tNotice.readMsg(tabdata.id.toLowerCase());
         }
 
     };
@@ -1362,9 +1362,9 @@ FList.Chat.printMessage = function(args){
     FList.Chat.Logs.Store(tab);
 
     if (args.from !== "System" &&
-       (_type === "user" || highlight) &&
+       (args.type === "user" || highlight) &&
        (!focus || tabFocus !== args.to.id.toLowerCase())) {
-            FList.Window.Notice.newMsg(args.to.id.toLowerCase());
+            FList.tNotice.newMsg(args.to.id.toLowerCase());
     }
 
 };
@@ -1775,10 +1775,8 @@ FList.Chat.Logs = {
  *
  * @author Kali/Maw
  */
-FList.Window = {
-    Notice: {
-        tabTally: {}
-    }
+FList.tNotice: {
+    tabTally: {}
 };
 
 var focus; /**@define {Boolean} focus Global window focus variable*/
@@ -1786,7 +1784,7 @@ var focus; /**@define {Boolean} focus Global window focus variable*/
 /**
  * Title draw function.
  */
-FList.Window.Notice.draw = function() {
+FList.tNotice.draw = function() {
     document.title = '(' + this.tabTally.sum + ') F-list - Chat';
 };
 
@@ -1794,7 +1792,7 @@ FList.Window.Notice.draw = function() {
  * Title tally function.
  * @param {string} tab Current tab ID
  */
-FList.Window.Notice.newMsg = function(tab) {
+FList.tNotice.newMsg = function(tab) {
 
     if (tab in this.tabTally) {
         this.tabTally[tab] += 1;
@@ -1815,7 +1813,7 @@ FList.Window.Notice.newMsg = function(tab) {
  * On focus, subtract total unread messages from newly viewed tab from the title, then draw.
  * @param {string} tab Current tab ID
  */
-FList.Window.Notice.readMsg = function(tab) {
+FList.tNotice.readMsg = function(tab) {
 
     this.tabTally.sum -= this.tabTally[tab];
 
@@ -1838,8 +1836,8 @@ window.onfocus = function() {
     focus = true;
 
     if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
-            FList.Window.Notice.tabTally) {
-        FList.Window.Notice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
+            FList.tNotice.tabTally) {
+        FList.tNotice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
     }
 };
 

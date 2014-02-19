@@ -74,7 +74,9 @@ FList.Chat.printMessage = (args) ->
 
     # Argument defaulting/checking
     args.to  = if isDefault then @TabBar.activeTab else args.to
+
     args.log = if args.log then true else false
+
     if not args.from or not args.msg or not args.type
         throw "Mandatory arguments missing on printMessage call."
 
@@ -129,6 +131,7 @@ FList.Chat.printMessage = (args) ->
     tab = @TabBar.getTabFromId args.to.type, args.to.id
 
     showmode = if args.to.type is "channel" then @channels.getData(args.to.id).userMode else "both"
+
     display = if (showmode is "ads" and (args.type is "chat" or args.type is "rp")) or
                  (showmode is "chat" and args.type is "ad") then false else true;
 
