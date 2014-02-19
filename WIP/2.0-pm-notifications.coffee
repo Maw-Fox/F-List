@@ -10,7 +10,7 @@
 
 FList.tNotice = tabTally: {}
 
-focus = true; # @define {Boolean} focus Global window focus variable
+focus = true # @define {Boolean} focus Global window focus variable
 
 # Title draw function.
 FList.tNotice.draw = ->
@@ -34,23 +34,23 @@ FList.tNotice.newMsg = (tab) ->
 # On focus, subtract total unread messages from newly viewed tab from the title, then draw.
 # @param {string} tab Current tab ID
 FList.tNotice.readMsg = (tab) ->
-    @tabTally.sum -= @tabTally.tab;
-    delete this.tabTally[tab];
+    @tabTally.sum -= @tabTally.tab
+    delete this.tabTally.tab
 
     if @tabTally.sum
         @draw
     else
-        delete @tabTally.sum;
-        document.title = "F-list - Chat";
+        delete @tabTally.sum
+        document.title = "F-list - Chat"
 
 # Sets a global 'focus' variable, which sets a true/false value to check if the user is currently focused on this window.
 # Checks if on focus will allow the person to read backlogged notifications.
 window.onfocus = ->
-    focus = true;
+    focus = true
 
     if FList.Chat.TabBar.activeTab.id.toLowerCase in FList.tNotice.tabTally
         FList.tNotice.readMsg FList.Chat.TabBar.activeTab.id.toLowerCase
 
 # Sets the global focus variable to false
 window.onblur = ->
-    focus = false;
+    focus = false

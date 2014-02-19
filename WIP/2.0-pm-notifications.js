@@ -28,7 +28,7 @@ FList.tNotice.newMsg = function(tab) {
 
 FList.tNotice.readMsg = function(tab) {
   this.tabTally.sum -= this.tabTally.tab;
-  delete this.tabTally[tab];
+  delete this.tabTally.tab;
   if (this.tabTally.sum) {
     return this.draw;
   } else {
