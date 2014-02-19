@@ -20,6 +20,7 @@
  */
 (function () {
 
+FList.Chat.Input = {};
 FList.Chat.Input.Commands = {};
 
 /**
@@ -50,9 +51,8 @@ curTab = FList.Chat.TabBar.activeTab,
  *
  * @param {String} msg The string to print
  */
-fprint = function(msg) {
-    FList.Chat.printMessage(msg, curTab.type, curTab.id, 'System',
-                                         'exact', 'error', false);
+fprint = function(message) {
+    FList.Chat.printMessage({msg: message, from: 'System', type: 'error', log: false});
 },
 
 /**
@@ -350,8 +350,8 @@ FList.Chat.Input.handle = function(msg) {
 
                 msg = FList.Chat.Input.sanitize(msg);
 
-                FList.Chat.printMessage(msg, 'channel', curTab.id, FList.Chat.identity,
-                                        'exact', msgType, true);
+                FList.Chat.printMessage({"msg": msg, to: FList.Chat.TabBar.getTabFromId('channel', curTab.id),
+                                        from: FList.Chat.identity, type: msgType});
 
                 pass();
             }
@@ -375,8 +375,7 @@ FList.Chat.Input.handle = function(msg) {
                 msg = msg.substr(3);
             }
 
-            FList.Chat.printMessage(msg, 'user', curTab.id, FList.Chat.identity,
-                                   'exact', msgType, true);
+            FList.Chat.printMessage({"msg": msg, from: FList.Chat.identity, type: msgType});
 
             pass();
 
@@ -758,8 +757,7 @@ FList.Chat.Input.Commands.listops = {
 
         str = str.substring(0 , (str.length - 2));
 
-        FList.Chat.printMessage('Ops: ' + str, curTab.type,
-              curTab.id, 'System', 'exact', 'system', true);
+        FList.Chat.printMessage({msg: 'Ops: ' + str, from: 'System', type: 'system'});
 
         pass();
     },
@@ -1909,5 +1907,4 @@ FList.Chat.Input.Commands.help = {
         }
     ]
 };
-
 }());
