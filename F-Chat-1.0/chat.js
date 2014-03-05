@@ -2790,11 +2790,11 @@ FList.Chat_commands['HLO'] = function(params) {//server welcome message
                             "\n\nClick the 'channels' button up top to choose a channel, or try" +
                             " [channel]Sex Driven LFRP[/channel] or [channel]Non-Sex Driven LfRP[/channel]" +
                             " to advertise for RP partners, [channel]RP Bar[/channel], [channel]RP Dark City[/channel]" +
-                            " or [channel]RP Nudist Camp[/channel] for general RP, or [channel]Frontpage[/channel]" + 
+                            " or [channel]RP Nudist Camp[/channel] for general RP, or [channel]Frontpage[/channel]" +
                             " for general OOC chatter.\n\nTo log out and retrieve your logs when you're done, click" +
                             " the 'F-Chat(####)' button up top.\n\nFor more help, type /help for command info," +
-                            " or join the [channel]Helpdesk[/channel] channel.\n\nRemember to follow the" + 
-                            " [url=https://wiki.f-list.net/index.php/Rules]site rules[/url]!"), 
+                            " or join the [channel]Helpdesk[/channel] channel.\n\nRemember to follow the" +
+                            " [url=https://wiki.f-list.net/index.php/Rules]site rules[/url]!"),
                             "ChatTypeInfo","", 0);
 };
 FList.Chat_commands['ADL'] = function(params) {
@@ -5030,7 +5030,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(new Date().getFullYear()-2000)+"$3"))) +","+ lsArray.join());
+                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
             } else {
                 if(FList.Chat_tabs.list[tab_index].hasDrawn===undefined){
                     if(FList.Chat_tabs.list[tab_index].localLogsOffset != undefined){
@@ -5040,7 +5040,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+y+"/"+m+"/"+(new Date().getFullYear()-2000)+"$3")));
+                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3")));
             }
             if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
             if(parseInt(localStorage["nextPreen"])<time){
