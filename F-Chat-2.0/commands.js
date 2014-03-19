@@ -345,17 +345,17 @@ FList.Chat.commands['JCH'] = function (params)
     FList.Chat.channels.addUser(params.channel, params.character.identity);
 };
 FList.Chat.commands['CKU'] = function (params){
-if(params.character==FList.Chat.identity){
-    FList.Chat.TabBar.setActive("console","console");
-    FList.Chat.printMessage({msg: 'You were kicked from ' + params.channel + ' by <a class="AvatarLink">' +
-                            params.operator + '</a>. You may access logs from the logs tab.',
-                            from: 'System', type: 'system'});
-} else {
-    FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> was kicked from ' +
-                            params.channel + ' by <a class="AvatarLink">' + params.operator + '</a>.',
-                            to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
-                            from: 'System', type: 'system'});
-}
+    if(params.character==FList.Chat.identity){
+        FList.Chat.TabBar.setActive("console","console");
+        FList.Chat.printMessage({msg: 'You were kicked from ' + params.channel + ' by <a class="AvatarLink">' +
+                                params.operator + '</a>. You may access logs from the logs tab.',
+                                from: 'System', type: 'system'});
+    } else {
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> was kicked from ' +
+                                params.channel + ' by <a class="AvatarLink">' + params.operator + '</a>.',
+                                to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
+                                from: 'System', type: 'system'});
+    }
 };
 FList.Chat.commands['CTU'] = function (params){
 if(params.character==FList.Chat.identity){
@@ -757,5 +757,22 @@ FList.Chat.commands['RTB'] = function(params) {
                                 '</a> was added to your friends list.', from: 'System', type: 'system'});
         FList.Chat.friendsList.push(params.name);
 
+    }
+};
+
+FList.Chat.commands['CBU'] = function(params) {
+    if(params.character === FList.Chat.identity){
+        if (FList.Chat.TabBar.activeTab.id === params.channel) {
+            FList.Chat.TabBar.setActive('console', 'console');
+        }
+
+        FList.Chat.printMessage({msg: 'You were banned from ' + params.channel + ' by <a class="AvatarLink">' +
+                                params.operator + '</a>. You may access logs from the logs tab.',
+                                from: 'System', type: 'system'});
+    } else {
+        FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> was banned from ' +
+                                params.channel + ' by <a class="AvatarLink">' + params.operator + '</a>.',
+                                to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
+                                from: 'System', type: 'system'});
     }
 };

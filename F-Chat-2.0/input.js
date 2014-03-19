@@ -766,6 +766,46 @@ FList.Chat.Input.Commands.listops = {
 };
 
 /**
+ * CBU
+ * Channel ban command.
+ *
+ * @param {Array} args Array of requested arguments
+ */
+FList.Chat.Input.Commands.ban = {
+    func: function(args) {
+
+        if (!args[1] && curTab.type !== 'channel') {
+            return fail('Using this command with one parameter only works if you are in a channel.');
+        }
+
+        if (args[1]) {
+            wsSend('CBU ' +
+                   JSON.stringify({channel: args[0], character: args[1]}));
+        } else {
+            wsSend('CBU ' +
+                   JSON.stringify({channel: curTab.id, character: args[0]}));
+        }
+
+        pass();
+    },
+    title: 'Ban',
+    does: 'Ban a user from a specific channel.',
+    params: [
+        {
+            type: 'character',
+            ID: 'Character',
+            hint: 'A valid existing character.'
+        },
+        {
+            type: 'string',
+            ID: 'Channel',
+            hint: 'The channel to unban the character from. (Optional)',
+            optional: true
+        }
+    ]
+};
+
+/**
  * CUB
  * Channel Unban command.
  *
@@ -1508,11 +1548,11 @@ FList.Chat.Input.Commands.profile = {
 
 /**
  * ACB
- * Account Ban command.
+ * Global Ban command.
  *
  * @param {Array} args Array of requested arguments
  */
-FList.Chat.Input.Commands.accountban = {
+FList.Chat.Input.Commands.gban = {
     func: function(args) {
         wsSend('ACB ' +
                JSON.stringify({character: args[0]}));
