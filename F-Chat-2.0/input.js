@@ -49,7 +49,7 @@ curTab = FList.Chat.TabBar.activeTab,
 /**
  * PrintMessage alias.
  *
- * @param {String} msg The string to print
+ * @param {String} message The string to print
  */
 fprint = function(message) {
     FList.Chat.printMessage({msg: message, from: 'System', type: 'error', log: false});
@@ -66,24 +66,24 @@ help = function(cmd) {
 
     cmd = FList.Chat.Input.Commands[cmd];
 
-    for (i = 0,ii=cmd.params.length;i < ii;++i) {
-        egParms += cmd.params[i].ID.toLowerCase();
-
-        if (((cmd.params[i].type === 'string' && cmd.params[i].separate) ||
-            (cmd.params[i].type === 'character' && !cmd.params[i].onlineOnly)) &&
-            (cmd.params.length > 1 && cmd.params.length !== (i + 1))) {
-            egParms += ', ';
-        } else {
-            egParms += ' ';
-        }
-
-    }
-
     fprint('[b]Help reference for[/b]: ' + cmd.title);
     fprint('[b]Command description[/b]: ' + cmd.does);
     fprint('[b]Syntax[/b]: /' + cmd.title.toLowerCase() + egParms);
 
     if (cmd.params) {
+        for (i = 0,ii=cmd.params.length;i < ii;++i) {
+            egParms += cmd.params[i].ID.toLowerCase();
+
+            if (((cmd.params[i].type === 'string' && cmd.params[i].separate) ||
+                (cmd.params[i].type === 'character' && !cmd.params[i].onlineOnly)) &&
+                (cmd.params.length > 1 && cmd.params.length !== (i + 1))) {
+                egParms += ', ';
+            } else {
+                egParms += ' ';
+            }
+
+        }
+
         fprint('[b]Parameters[/b]: ');
 
         for (i = 0;i < cmd.params.length;++i) {
@@ -437,8 +437,7 @@ FList.Chat.Input.Commands.join = {
 /**
  * Close command.
  */
-FList.Chat.Input.Commands.close =
-{
+FList.Chat.Input.Commands.close = {
     func: function() {
 
         if (curTab.type === 'console') {
@@ -553,8 +552,8 @@ FList.Chat.Input.Commands.timeout = {
 
         pass();
     },
-    title: 'timeout',
-    does: 'Temporary rejects access to the chat client for a specified period of time that' +
+    title: 'Timeout',
+    does: 'Temporarily rejects access to the chat client for a specified period of time that' +
           'does not exceed 90 minutes. This is relative to the chat client specifically.',
     params: [
         {
@@ -566,7 +565,7 @@ FList.Chat.Input.Commands.timeout = {
         {
             type: 'number',
             ID: 'Minutes',
-            hint: 'The amount of time (in minutes) to temporary reject access to the chat for the user. (Limit: 90)',
+            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user. (Limit: 90)',
             limit: [1 , 90]
         }
     ]
@@ -586,7 +585,7 @@ FList.Chat.Input.Commands.gtimeout = {
         pass();
     },
     title: 'Gtimeout',
-    does: 'Temporary rejects access to the chat client for a specified period of time that ' +
+    does: 'Temporarily rejects access to the chat client for a specified period of time that ' +
           'does not exceed 90 minutes. This is relative to the chat client specifically.',
     params: [
         {
@@ -598,7 +597,7 @@ FList.Chat.Input.Commands.gtimeout = {
         {
             type: 'number',
             ID: 'Minutes',
-            hint: 'The amount of time (in minutes) to temporary reject access to the chat for the user. (Limit: 90)',
+            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user. (Limit: 90)',
             limit: [1 , 90]
         },
         {
@@ -799,7 +798,7 @@ FList.Chat.Input.Commands.ban = {
         {
             type: 'string',
             ID: 'Channel',
-            hint: 'The channel to unban the character from. (Optional)',
+            hint: 'The channel to ban the character from. (Optional)',
             optional: true
         }
     ]
