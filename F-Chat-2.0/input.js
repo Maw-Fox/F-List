@@ -178,13 +178,13 @@ FList.Chat.Input.parse = function(input) {
         curfmt = paramfmt[i];
 
         if (parameters.length === 0 && !curfmt.optional) {
-            return fail('Parameter missing for mandatory argument number ' + (i + 1) + '.', invoke);
+            return fail('Parameter missing for mandatory parameter number ' + (i + 1) + '.', invoke);
         }
 
         if (curfmt.type === 'word') {
 
             if (curfmt.oneOf && curfmt.oneOf.indexOf(parameters[0].toLowerCase()) === -1) {
-                return fail('Argument number ' + (i + 1) + ' is not one of the accepted inputs.', invoke);
+                return fail('Parameter number ' + (i + 1) + ' is not one of the accepted inputs.', invoke);
             }
 
             toSend.push(parameters
@@ -262,11 +262,11 @@ FList.Chat.Input.parse = function(input) {
             num = parseInt(parameters[0], 10);
 
             if (isNaN(num)) {
-                return fail('Argument number ' + (i + 1) + ' is not an integer.', invoke);
+                return fail('Parameter number ' + (i + 1) + ' is not an integer.', invoke);
             }
 
             if (!(curfmt.limit && num >= curfmt.limit[0] && num <= curfmt.limit[0])) {
-                return fail('Argument number ' + (i + 1) +
+                return fail('Parameter number ' + (i + 1) +
                                 ' is out of range of specified numerical limits.', invoke);
             }
 
@@ -834,7 +834,7 @@ FList.Chat.Input.Commands.gunban = {
         {
             type: 'character',
             ID: 'Character',
-            hint: 'A valid existing character.',
+            hint: 'A valid existing character. (Optional)',
             optional: true
         }
     ]
@@ -930,7 +930,7 @@ FList.Chat.Input.Commands.ignore = {
         {
             type: 'character',
             ID: 'Character',
-            hint: 'A valid existing character.',
+            hint: 'A valid existing character. (Optional)',
             optional: true
         }
     ]
@@ -989,7 +989,7 @@ FList.Chat.Input.Commands.unignore = {
         {
             type: 'character',
             ID: 'Character',
-            hint: 'A valid existing character.',
+            hint: 'A valid existing character. (Optional)',
             optional: true
         }
     ]
@@ -1902,7 +1902,7 @@ FList.Chat.Input.Commands.help = {
         {
             type: 'string',
             ID: 'Command',
-            hint: 'The command to display the helpfile for.',
+            hint: 'The command to display the helpfile for. (Optional)',
             optional: true
         }
     ]
