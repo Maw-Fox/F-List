@@ -18,7 +18,6 @@
 WEB_SOCKET_SWF_LOCATION = "../WebSocket.swf";WEB_SOCKET_DEBUG = false;
 
 $(function () {
-
     FList.ChatParser = new FList.BBParser();
     //FList.ChatParser.replaceLongWordsWith("<span class=\"redfont\">- Word stretching detected. Message filtered by the chat. -</span>");
     FList.ChatParser.addCustomTag("user", false, function(content) {
@@ -1400,6 +1399,10 @@ FList.Chat.printMessage = function(args){
 
     }
 
+    if (args.log && tab.logs.length && tab.logs[tab.logs.length-1].scheduledDeletion) {
+        tab.logs.pop();
+    }
+
     if (args.log) {
         tab.logs.push({"type": args.type ,"by": args.from, "html": html});
 
@@ -1411,6 +1414,10 @@ FList.Chat.printMessage = function(args){
 
         }
 
+    } else if (!args.log && tab.logs.length === 0) {
+        // This is here because if an unlogged printmessage is on the first line of the window,
+        // it replaces all concurrent unlogged printmessages before it.
+        tab.logs.push({"type": args.type ,"by": args.from, "html": html, scheduledDeletion: true});
     }
 
     FList.Chat.Logs.Store(tab);
