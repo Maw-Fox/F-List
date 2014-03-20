@@ -25,7 +25,7 @@ FList.Chat.parseCommand = function (line)
     else
     {
         FList.Chat.printMessage({msg: 'Unhandled command: ' + line,
-                                to: FList.Chat.TabBar.getTabFromId('console', 'console'),
+                                to: this.TabBar.getTabFromId('console', 'console'),
                                 from: 'Server', type: 'error'});
     }
 };

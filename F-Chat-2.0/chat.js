@@ -1171,7 +1171,8 @@ FList.Chat.Roleplay = {
             if(jQuery.trim(message).length>0){
                 if(FList.Chat.Settings.current.html5Audio) FList.Chat.Sound.playSound("chat");
                 FList.Connection.send("LRP " + JSON.stringify({ "channel": channel, "message": message }));
-                FList.Chat.printMessage(FList.Chat.Input.sanitize(message), "channel", channel, FList.Chat.identity, "exact", "ad", true);
+                FList.Chat.printMessage({msg: FList.Chat.Input.sanitize(message),
+                                        to: tab, from: FList.Chat.identity, type: "ad", log: true});
                 $("#message-field").val("");
             } else {
                 FList.Common_displayError("You didn't enter a message.");
