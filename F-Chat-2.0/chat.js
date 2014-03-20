@@ -666,9 +666,8 @@ FList.Chat.UserBar = new function UserBar() {
     };
 };
 
-FList.Chat.TypingArea = function TypingArea() {
-
-    this.create = function(){
+FList.Chat.TypingArea = {
+    create: function(){
         $("#message-field").keydown(function(e){
             $(".autocompletelink").each(function(i, el){ $(this).replaceWith($(this).text()); });
             if(e.which===9 && !e.ctrlKey){
@@ -695,14 +694,12 @@ FList.Chat.TypingArea = function TypingArea() {
         });
         $( "#typing-area" ).resizable("destroy");
         $( "#typing-area" ).resizable({ handles: "n", maxHeight: 300, minHeight: 50, resize: function(){ FList.Chat.UI.resize(); } });
-    };
-
-    this.update=function(){
+    },
+    update: function(){
         $( "#typing-area" ).css("top","0px");$( "#typing-area textarea" ).css("height", $("#typing-area").height() -8 );$(".send-input-single").css("height",$("#typing-area").height()-4 + "px");$(".send-input-choice").css("height",(($("#typing-area").height())/2) + "px");$("#typing-send-actions").css("height", $("#typing-area").height());
         $("#typing-area").css("width", "auto");
-    };
-
-    this.indicate= function(){
+    },
+    indicate: function(){
         var maxheight=$("#message-field").outerHeight();
         var curlength=$("#message-field").val().length;
         var maxlength=0;
@@ -720,7 +717,7 @@ FList.Chat.TypingArea = function TypingArea() {
         } else {
             $("#typing-indicator").css("background-color", '#000000');
         }
-    };
+    }
 };
 
 FList.Chat.InfoBar = new function InfoBar() {
@@ -1160,6 +1157,63 @@ FList.Chat.TabBar = new function TabBar() {
             tab.tab.attr("title", title);
         }
     };
+};
+
+FList.Chat.Roleplay = {
+    timer: 0,
+
+    isRoleplay: function(message){ return (message.substring(0,4)=="/me " || message.substring(0,4)=="/me'") ? true : false; },
+
+    sendAd: function(channel, message){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        if(this.canPost(channel)<=0){
+            this.setPosted(channel);
+            if(jQuery.trim(message).length>0){
+                if(FList.Chat.Settings.current.html5Audio) FList.Chat.Sound.playSound("chat");
+                FList.Connection.send("LRP " + JSON.stringify({ "channel": channel, "message": message }));
+                FList.Chat.printMessage(FList.Chat.Input.sanitize(message), "channel", channel, FList.Chat.identity, "exact", "ad", true);
+                $("#message-field").val("");
+            } else {
+                FList.Common_displayError("You didn't enter a message.");
+            }
+        } else {
+            FList.Common_displayError("You have to wait " + (this.canPost(channel)/1000) + " seconds before you can post another ad here.");
+        }
+    },
+
+    timerClock: function(channel){
+        this.update(channel);
+    },
+
+    setPosted: function(channel){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        tab.lastAd = new Date().getTime();
+        this.update(channel);
+        clearTimeout(FList.Chat.Roleplay.timer);
+        FList.Chat.Roleplay.timer=setTimeout(function(){ FList.Chat.Roleplay.timerClock(channel); }, FList.Chat.serverVars["lfrp_flood"] * 1000);
+    },
+
+    canPost: function(channel){
+        var tab=FList.Chat.TabBar.getTabFromId("channel", channel);
+        var remaining = parseInt(tab.lastAd-(new Date().getTime() - FList.Chat.serverVars["lfrp_flood"] * 1000));
+        return remaining>0 ? remaining : 0;
+    },
+
+    //tab switch
+    update: function(channel){
+        clearTimeout(FList.Chat.Roleplay.timer);
+        if(FList.Chat.TabBar.activeTab.type!=="channel") return;
+        if(FList.Chat.channels.getData(FList.Chat.TabBar.activeTab.id).mode=="chat") return;
+        if(this.canPost(channel)>0){
+            $(".send-input-ad").attr("disabled", true);
+            $(".send-input-ad").addClass("Busy").css({"background-repeat":"no-repeat","background-position":"left center"});
+            FList.Chat.Roleplay.timer=setTimeout(function(){ FList.Chat.Roleplay.timerClock(channel); }, this.canPost(channel)+1000);
+        } else {
+            $(".send-input-ad").button("enable").removeClass("Busy").removeAttr("style");
+        }
+    }
+
+
 };
 
 /**
@@ -1834,8 +1888,8 @@ FList.tNotice.readMsg = function(tab) {
 window.onfocus = function() {
     wfocus = true;
 
-    if (FList.Chat.TabBar.activeTab.id.toLowerCase() in
-            FList.tNotice.tabTally) {
+    if (FList.Chat.TabBar.activeTab.id &&
+            FList.Chat.TabBar.activeTab.id.toLowerCase() in FList.tNotice.tabTally) {
         FList.tNotice.readMsg(FList.Chat.TabBar.activeTab.id.toLowerCase());
     }
 };
