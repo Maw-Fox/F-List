@@ -1274,7 +1274,7 @@ FList.Chat.printMessage = function(args){
     if (this.Settings.current.highlightMentions &&
        (args.type === "chat" || args.type !== "ad" || args.type !== "rp")) {
 
-            for (i = 0; i < this.Settings.current.highlightWords; ++i) {
+            for (i = 0; i < this.Settings.current.highlightWords.length; ++i) {
                 regx = new RegExp("\\b" +
                                 this.Settings.current.highlightWords[i] +
                                 "('s)?\\b", "i");
