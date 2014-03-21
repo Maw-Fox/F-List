@@ -565,8 +565,8 @@ FList.Chat.Input.Commands.timeout = {
         {
             type: 'number',
             ID: 'Minutes',
-            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user. (Limit: 90)',
-            limit: [1 , 90]
+            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user.',
+            limit: [1 , Infinity]
         }
     ]
 };
@@ -597,8 +597,8 @@ FList.Chat.Input.Commands.gtimeout = {
         {
             type: 'number',
             ID: 'Minutes',
-            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user. (Limit: 90)',
-            limit: [1 , 90]
+            hint: 'The amount of time (in minutes) to temporarily reject access to the chat for the user.',
+            limit: [1 , Infinity]
         },
         {
             type: 'string',
@@ -624,7 +624,7 @@ FList.Chat.Input.Commands.roll = {
             r,
             d;
 
-        channel = curTab;
+        channel = FList.Chat.TabBar.activeTab;
 
         if(channel.type !== 'channel') {
             return fail('You can only roll dice in a channel.');
@@ -640,7 +640,7 @@ FList.Chat.Input.Commands.roll = {
 
         for (i = 0;i < rolls.length;++i) {
 
-            if (!((/^[0-9]d[0-9]+$/).test(rolls[i]))) {
+            if (!((/^[0-9]d[0-9]+$/).test(rolls[i]) || (/^[0-9]+$/.test(rolls[i])))) {
                 return fail('Wrong dice format. Dice format is throw+throw+throw+...' +
                             ', where a throw is either [1-9]d[2-100] or just a number to be added.');
             }
@@ -651,11 +651,11 @@ FList.Chat.Input.Commands.roll = {
 
             d = parseInt(dt[1], 10);
 
-            if (r > 9 || d < 2 || d > 500) {
+            if (r > 9 || d < 1 || d > 500) {
                 return fail('Dice integers out of valid range.');
             }
 
-            if (!((/^[0-9]+$/).test(rolls[i])) || parseInt(rolls[i], 10) > 10000) {
+            if (parseInt(rolls[i], 10) > 10000) {
                 return fail('Invalid modifier or modifier out of range.');
             }
 

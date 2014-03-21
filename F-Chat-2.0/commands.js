@@ -600,7 +600,7 @@ FList.Chat.commands['RMO'] = function(params) {
     if(channel!=-1){
         channel.mode = params.mode;
         FList.Chat.printMessage({msg: 'Room mode for room ' + channel.title + ' has been set to ' + channel.mode + '.',
-                                to: params.channel, from: 'System', type: 'system'});
+                                to: FList.Chat.TabBar.getTabFromId('channel', params.channel), from: 'System', type: 'system'});
         channel.mode=params.mode;
         if((channel.mode=="ads" || channel.mode=="chat") && channel.userMode=="both") channel.userMode=channel.mode;
         if(channel.userMode=="chat" && channel.mode=="ads") channel.userMode=channel.mode;
@@ -644,7 +644,7 @@ FList.Chat.commands['PRD'] = function(params) {
 FList.Chat.commands['RLL'] = function(params) {
     var printtab=FList.Chat.TabBar.getTabFromId("channel", params.channel);
     if(printtab!==false){
-        FList.Chat.printMessage({msg: params.message, to: params.channel, from: 'System', type: 'system'});
+        FList.Chat.printMessage({msg: params.message, to: FList.Chat.TabBar.getTabFromId('channel', params.channel), from: 'System', type: 'system'});
     }
 };
 FList.Chat.commands['SFC'] = function(params) {
