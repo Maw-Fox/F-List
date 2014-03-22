@@ -1493,6 +1493,12 @@ FList.Chat.Notifications = {
     init: function(){
         if(window.webkitNotifications){
             window.webkitNotifications.requestPermission();
+        } else if (Notification) {
+            Notification.requestPermission(function (status) {
+                if (Notification.permission !== status) {
+                    Notification.permission = status;
+                }
+            });
         }
     },
     message: function(title, message, image, callback){
@@ -1509,6 +1515,13 @@ FList.Chat.Notifications = {
                 }, '10000');
 
                 instance.show();
+            }
+        } else if(Notification) {
+            if(Notification.permission === "granted"){
+                (function(){
+                    var instance = new Notification(title, {icon: escape(image), body: message.substr(0,100)});
+                    setTimeout(instance.close(), 10000);
+                }());
             }
         }
     }
