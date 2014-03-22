@@ -1522,7 +1522,7 @@ FList.Chat.Notifications = {
                     var instance = new Notification(
                         title,
                         {
-                            icon: escape(image),
+                            icon: image,
                             body: message.substr(0,100)
                         }
                     );
