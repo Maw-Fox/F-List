@@ -1516,10 +1516,16 @@ FList.Chat.Notifications = {
 
                 instance.show();
             }
-        } else if(Notification) {
-            if(Notification.permission === "granted"){
-                (function(){
-                    var instance = new Notification(title, {icon: escape(image), body: message.substr(0,100)});
+        } else if (Notification) {
+            if (Notification.permission === "granted") {
+                (function() {
+                    var instance = new Notification(
+                        title,
+                        {
+                            icon: escape(image),
+                            body: message.substr(0,100)
+                        }
+                    );
                     setTimeout(instance.close(), 10000);
                 }());
             }
