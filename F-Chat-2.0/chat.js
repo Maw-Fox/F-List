@@ -1223,8 +1223,8 @@ FList.Chat.Roleplay = {
  * Optional arguments will be allotted with the current active tab (to) and logging (persistence) will be true by default.
  */
 FList.Chat.printMessage = function(args){
-    var scrollDown=false,
-        highlight=false,
+    var scrollDown = false,
+        highlight = false,
         isDefault = (!args.to || args.to === {} ||
                     args.to.id.toLowerCase() === this.TabBar.activeTab.id.toLowerCase()) ?
                         true: false,
@@ -1232,8 +1232,7 @@ FList.Chat.printMessage = function(args){
         tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
         ct = new Date(),
         time = ct.getHours() + ":" +
-               (ct.getMinutes() < 10 ? "0" + ct.getMinutes(): ct.getMinutes()) +
-               " " + (ct.getHours() > 11 ? "PM" : "AM"),
+               (ct.getMinutes() < 10 ? "0" + ct.getMinutes(): ct.getMinutes()),
         regx,
         avatarclasses,
         html = "",
@@ -1246,7 +1245,6 @@ FList.Chat.printMessage = function(args){
     args.log = (args.log === undefined) ? true: args.log;
 
     if (!args.from || !args.msg || !args.type) {
-        console.log(args);
         throw "Mandatory arguments missing on printMessage call.";
     }
 
@@ -1325,7 +1323,7 @@ FList.Chat.printMessage = function(args){
     showmode = (args.to.type === "channel") ? this.channels.getData(args.to.id).userMode: "both";
 
     display = ((showmode === "ads" && (args.type === "chat" || args.type === "rp")) ||
-                (showmode==="chat" && args.type === "ad")) ? false: true;
+                (showmode === "chat" && args.type === "ad")) ? false: true;
 
     if (isDefault) {
 
@@ -1350,7 +1348,7 @@ FList.Chat.printMessage = function(args){
 
             if (args.to.type === "channel") {
                 if (display) {
-                    tab.pending+=1;
+                    tab.pending += 1;
                     if (highlight) {
                         tab.mentions += 1;
 
