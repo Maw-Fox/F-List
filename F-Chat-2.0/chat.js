@@ -1222,7 +1222,7 @@ FList.Chat.Roleplay = {
  * @param {{msg:String, [to]:Object, from:String, type:String, [log]:*}} args
  * Optional arguments will be allotted with the current active tab (to) and logging (persistence) will be true by default.
  */
-FList.Chat.printMessage = function(args){
+FList.Chat.printMessage = function(args) {
     var scrollDown = false,
         highlight = false,
         isDefault = (!args.to || args.to === {} ||
