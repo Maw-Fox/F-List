@@ -900,8 +900,6 @@ FList.Chat.TabBar = new function TabBar() {
                 if(restore.type==="user") FList.Chat.openPrivateChat(restore.id, false);
             });
             FList.Chat.restoreTabs=[];
-        } else {//if not, load default tabs
-            FList.Chat.openChannelChat("Frontpage",false);
         }
     };
 
