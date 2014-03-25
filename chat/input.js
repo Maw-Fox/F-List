@@ -1147,7 +1147,7 @@ FList.Chat.Input.Commands.reload = {
 
         pass();
     },
-    title: 'Config Reload',
+    title: 'Reload Config',
     does: 'Reloads server config files from disk.',
     params: [
         {
