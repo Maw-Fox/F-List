@@ -1522,6 +1522,10 @@ FList.Chat.Notifications = {
                             body: message.substr(0,100)
                         }
                     );
+                    instance.onclick = function() {
+                        callback();
+                        window.focus();
+                    };
                     setTimeout(instance.close(), 10000);
                 }());
             }
