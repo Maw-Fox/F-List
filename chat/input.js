@@ -314,7 +314,7 @@ FList.Chat.Input.handle = function(msg) {
         isRp = (/^\/me[\s']/gi).test(msg),
         msgType = 'chat',
         isCmd = msg.charAt(0) === '/',
-        isWarn = msg.substring(6) === '/warn ';
+        isWarn = msg.substring(0, 6) === '/warn ';
 
     if (isRp) {
         msgType = 'rp';
