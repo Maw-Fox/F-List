@@ -75,7 +75,7 @@ help = function(cmd) {
             egParms += cmd.params[i].ID.toLowerCase();
 
             if ((cmd.params[i].separate ||
-                !cmd.params[i].onlineOnly) &&
+                (cmd.params[i].type === 'character' && !cmd.params[i].onlineOnly)) &&
                 (cmd.params.length > 1 && cmd.params.length !== (i + 1))) {
                 egParms += ', ';
             } else {
