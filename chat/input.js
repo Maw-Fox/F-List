@@ -1560,7 +1560,7 @@ FList.Chat.Input.Commands.gban = {
 
         pass();
     },
-    title: 'Global ban',
+    title: 'Gban',
     does: 'Bans a user\'s account from F-Chat.',
     params: [
         {
