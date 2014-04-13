@@ -68,14 +68,14 @@ help = function(cmd) {
 
     fprint('[b]Help reference for[/b]: ' + cmd.title);
     fprint('[b]Command description[/b]: ' + cmd.does);
-    fprint('[b]Syntax[/b]: /' + cmd.title.toLowerCase() + egParms);
+
 
     if (cmd.params) {
-        for (i = 0,ii=cmd.params.length;i < ii;++i) {
+        for (i = 0, ii = cmd.params.length; i < ii; ++i) {
             egParms += cmd.params[i].ID.toLowerCase();
 
-            if (((cmd.params[i].type === 'string' && cmd.params[i].separate) ||
-                (cmd.params[i].type === 'character' && !cmd.params[i].onlineOnly)) &&
+            if ((cmd.params[i].separate ||
+                !cmd.params[i].onlineOnly) &&
                 (cmd.params.length > 1 && cmd.params.length !== (i + 1))) {
                 egParms += ', ';
             } else {
@@ -83,6 +83,8 @@ help = function(cmd) {
             }
 
         }
+
+        fprint('[b]Syntax[/b]: /' + cmd.title.toLowerCase() + egParms);
 
         fprint('[b]Parameters[/b]: ');
 
