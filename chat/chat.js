@@ -1497,12 +1497,12 @@ FList.Chat.Notifications = {
             });
         }
     },
-    message: function(title, message, image, callback){
+    message: function(title, message, image, tabInstance){
         if(window.webkitNotifications){
             if(window.webkitNotifications.checkPermission() === 0){
                 var instance=window.webkitNotifications.createNotification(image,title, message.substr(0,100));
                 instance.onclick = function() {
-                    callback();
+                    tabInstance();
                     window.focus();
                     this.cancel();
                 };
@@ -1522,6 +1522,9 @@ FList.Chat.Notifications = {
                             body: message.substr(0,100)
                         }
                     );
+                    instance.onclick = function() {
+                        tabInstance();
+                    };
                     setTimeout(instance.close(), 10000);
                 }());
             }
