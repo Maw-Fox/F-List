@@ -1402,6 +1402,18 @@ FList.Chat.printMessage = function(args) {
     if (args.log) {
         tab.logs.push({"type": args.type ,"by": args.from, "html": html});
 
+        if (tab.logs.raw === undefined) {
+            tab.logs.raw = "<<<<LOG START: " + new Date().toUTCString() + ">>>>\n";
+        } else {
+            tab.logs.raw += "[" + new Date().toUTCString().split(" ")[4] + "] " + args.from + ": " +
+                args.msg.replace(/(\<br\/\>|\<br\s\/\>)/gi, "\n")
+                        .replace(/\&gt\;/gi, ">")
+                        .replace(/\&lt\;/gi, "<")
+                        .replace(/\&\#91\;/gi, "[")
+                        .replace(/\&\#93\;/gi, "]") +
+                        "\n";
+        }
+
         if(!this.Settings.current.enableLogging){
 
             if(tab.logs.length > this.Settings.current.visibleLines) {
@@ -1512,7 +1524,7 @@ FList.Chat.Notifications = {
 
                 instance.show();
             }
-        } else if (Notification) {
+        } else if (window.Notification) {
             if (Notification.permission === "granted") {
                 (function() {
                     var instance = new Notification(
@@ -1686,7 +1698,7 @@ FList.Chat.staffAlert = {
                     var reportText=alertdialog.find(".ui-report-text").val();
                     var reportUser=alertdialog.find(".ui-report-user").val();
                     var logs="";
-                    logs = JSON.stringify(FList.Chat.TabBar.activeTab.logs);
+                    logs = FList.Chat.TabBar.activeTab.logs.raw;
                     FList.Chat.printMessage({msg: 'Hang on, the chat is uploading your chat log...',
                                             from: 'System', type: 'system'});
                     jQuery.post("https://" + window.location.host + "/fchat/submitLog.php", { character: FList.Chat.identity, log: logs, reportText: reportText, reportUser: reportUser, channel: FList.Chat.TabBar.activeTab.id  }, function(data) {
