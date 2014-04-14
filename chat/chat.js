@@ -1342,56 +1342,55 @@ FList.Chat.printMessage = function(args) {
             }
 
     }
-    if (!isDefault || !this.focused) {
+    if (!isDefault || (tabFocus !== args.to.id.toLowerCase()) || !wfocus) {
 
-            if (args.to.type === "channel") {
-                if (display) {
-                    tab.pending += 1;
-                    if (highlight) {
-                        tab.mentions += 1;
-
-                        if (this.Settings.current.html5Audio) {
-                            FList.Chat.Sound.playSound("attention");
-                        }
-
-                        if (this.Settings.current.html5Notifications) {
-                            this.Notifications.message("A word/name was highlighted,  by " + args.from +
-                                                       " in " + args.to.id, args.msg.substring(0,100), staticdomain +
-                                                       "images/avatar/" + args.from.toLowerCase() + ".png",
-                                                       function(){
-                                                            FList.Chat.TabBar.setActive(args.to.type, args.to.id);
-                                                       });
-                        }
-
-                    }
-
-                }
-
-            }
-
-            if (args.to.type === "user") {
-
-                if (args.type === "chat" || args.type === "rp") {
+        if (args.to.type === "channel") {
+            if (display) {
+                tab.pending += 1;
+                if (highlight) {
                     tab.mentions += 1;
 
                     if (this.Settings.current.html5Audio) {
-                        this.Sound.playSound("attention");
+                        FList.Chat.Sound.playSound("attention");
                     }
 
                     if (this.Settings.current.html5Notifications) {
-                        this.Notifications.message("You received a private message from " +
-                                                   args.from, args.msg.substring(0,100), staticdomain + "images/avatar/" +
-                                                   args.from.toLowerCase() + ".png",
-                                                   function() {
-                                                       FList.Chat.TabBar.setActive(args.to.type, args.to.id);
+                        this.Notifications.message("A word/name was highlighted,  by " + args.from +
+                                                   " in " + args.to.id, args.msg.substring(0,100), staticdomain +
+                                                   "images/avatar/" + args.from.toLowerCase() + ".png",
+                                                   function(){
+                                                        FList.Chat.TabBar.setActive(args.to.type, args.to.id);
                                                    });
                     }
 
-                } else {
-                    tab.pending += 1;
                 }
 
             }
+
+        }
+        if (args.to.type === "user" && args.from !== FList.Chat.identity) {
+
+            if (args.type === "chat" || args.type === "rp") {
+                tab.mentions += 1;
+
+                if (this.Settings.current.html5Audio) {
+                    this.Sound.playSound("attention");
+                }
+
+                if (this.Settings.current.html5Notifications) {
+                    this.Notifications.message("You received a private message from " +
+                                               args.from, args.msg.substring(0,100), staticdomain + "images/avatar/" +
+                                               args.from.toLowerCase() + ".png",
+                                               function() {
+                                                   FList.Chat.TabBar.setActive(args.to.type, args.to.id);
+                                               });
+                }
+
+            } else {
+                tab.pending += 1;
+            }
+
+        }
 
     }
 
