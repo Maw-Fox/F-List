@@ -1229,7 +1229,7 @@ FList.Chat.printMessage = function(args) {
         classList = "chat-message chat-type-" + args.type,
         tabFocus = FList.Chat.TabBar.activeTab.id.toLowerCase(),
         ct = new Date(),
-        time = ct.getHours() + ":" +
+        time = (ct.getHours() < 10 ? "0" + ct.getHours(): ct.getHours()) + ":" +
                (ct.getMinutes() < 10 ? "0" + ct.getMinutes(): ct.getMinutes()),
         regx,
         avatarclasses,
@@ -1784,7 +1784,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
+                localStorage[acctStr] = (escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
             } else {
                 if(tab.hasRendered === undefined){
                     if(tab.localLogsOffset !== undefined){
@@ -1794,7 +1794,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3")));
+                localStorage[acctStr] = escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3")));
             }
             if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
             if(parseInt(localStorage["nextPreen"])<time){

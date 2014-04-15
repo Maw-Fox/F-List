@@ -5030,7 +5030,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
+                localStorage[acctStr] = (escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
             } else {
                 if(FList.Chat_tabs.list[tab_index].hasDrawn===undefined){
                     if(FList.Chat_tabs.list[tab_index].localLogsOffset != undefined){
@@ -5040,7 +5040,7 @@ FList.Chat.Logs = {
                     }
                 }
                 localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2}\s[A-Z]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3")));
+                localStorage[acctStr] = escape(FList.Chat_tabs.list[tab_index].logs[0][0].outerHTML.replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+new Date().getFullYear()+"/"+m+"/"+y+"$3")));
             }
             if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
             if(parseInt(localStorage["nextPreen"])<time){
