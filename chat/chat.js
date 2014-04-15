@@ -1500,7 +1500,7 @@ FList.Chat.Notifications = {
     init: function(){
         if(window.webkitNotifications){
             window.webkitNotifications.requestPermission();
-        } else if (Notification) {
+        } else if (window.Notification) {
             Notification.requestPermission(function (status) {
                 if (Notification.permission !== status) {
                     Notification.permission = status;
