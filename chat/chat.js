@@ -1420,20 +1420,19 @@ FList.Chat.printMessage = function(args) {
 
         if (tab.logs.raw === undefined) {
             tab.logs.raw = "<<<<LOG START: " + new Date().toUTCString() + ">>>>\n[" +
-                        new Date().toUTCString().split(" ")[4] + "] " + args.from + ": " +
-                        args.msg.replace(/(\<br\/\>|\<br\s\/\>)/gi, "\n")
-                                .replace(/\&gt\;/gi, ">")
-                                .replace(/\&lt\;/gi, "<")
-                                .replace(/\&\#91\;/gi, "[")
-                                .replace(/\&\#93\;/gi, "]") + "\n";
+                new Date().toUTCString().split(" ")[4] + "] " + args.from + ": " +
+                args.msg.replace(/(\<br\/\>|\<br\s\/\>)/gi, "\n")
+                        .replace(/\&gt\;/gi, ">")
+                        .replace(/\&lt\;/gi, "<")
+                        .replace(/\&\#91\;/gi, "[")
+                        .replace(/\&\#93\;/gi, "]") + "\n";
         } else {
             tab.logs.raw += "[" + new Date().toUTCString().split(" ")[4] + "] " + args.from + ": " +
                 args.msg.replace(/(\<br\/\>|\<br\s\/\>)/gi, "\n")
                         .replace(/\&gt\;/gi, ">")
                         .replace(/\&lt\;/gi, "<")
                         .replace(/\&\#91\;/gi, "[")
-                        .replace(/\&\#93\;/gi, "]") +
-                        "\n";
+                        .replace(/\&\#93\;/gi, "]") + "\n";
         }
 
         if(!this.Settings.current.enableLogging){
