@@ -369,6 +369,10 @@ FList.Chat.Status = {
         FList.Chat.IdleTimer.idle=false;
         FList.Chat.IdleTimer.reset();
         FList.Connection.send("STA " + JSON.stringify({ status: newstatus, statusmsg: newmessage }));
+
+        FList.Chat.Status.response.msg = undefined;
+        FList.Chat.Status.response.alertedUsers = {};
+
         $("#chatui-tabs").tabs( "select" , 1 );
     },
     lastStatus: { status: "Online", statusMessage: "" },
@@ -391,6 +395,10 @@ FList.Chat.Status = {
         FList.Chat.printMessage({msg: 'Your status was set to ' + (((status === 'Crown') ? 'Cookie': status) +
                                 ((message.length > 0) ? ', "' + FList.Chat.Input.sanitize(message) + '"' : '')),
                                 from: 'System', type: 'system'});
+
+        FList.Chat.Status.response.msg = undefined;
+        FList.Chat.Status.response.alertedUsers = {};
+
         if(status!=="Idle"){
             this.lastStatus.status=status.toLowerCase();
         }
@@ -400,6 +408,15 @@ FList.Chat.Status = {
 
     restore: function(){
        FList.Connection.send("STA " + JSON.stringify({ status: this.lastStatus.status, statusmsg: this.lastStatus.statusMessage }));
+
+        FList.Chat.Status.response.msg = undefined;
+        FList.Chat.Status.response.alertedUsers = {};
+    },
+
+    response: {
+        alertedUsers: {},
+        msg: undefined,
+        default: FList.Chat.Settings.current.defaultResponse
     }
 
 };
@@ -1577,14 +1594,17 @@ FList.Chat.IdleTimer = {
         if(FList.Chat.Settings.current.autoIdle) FList.Chat.IdleTimer.enable();
     },
     enable: function(){
-        if(FList.Chat.Settings.current.autoIdle){
-        FList.Chat.IdleTimer.timer = setTimeout(function () {
+        if(FList.Chat.Settings.current.autoIdle) {
+            FList.Chat.IdleTimer.timer = setTimeout(function () {
                 FList.Chat.IdleTimer.timer=0;
                 var tempstate={};
                 tempstate.status="Idle";
                 tempstate.statusmsg=FList.Chat.Status.lastStatus.statusMessage;
                 FList.Connection.send("STA " + JSON.stringify(tempstate));
                 FList.Chat.IdleTimer.idle=true;
+
+                FList.Chat.Status.response.msg = undefined;
+                FList.Chat.Status.response.alertedUsers = {};
             }, FList.Chat.Settings.current.autoIdleTime);
         }
     },
