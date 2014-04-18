@@ -1701,17 +1701,8 @@
     FList.Chat.Input.Commands.setdescription = {
         func: function(args) {
 
-            if (!args[1] && curTab.type !== 'channel') {
-                return fail('Using this command with one parameter only works if you are in a channel.');
-            }
-
-            if (args[1]) {
-                wsSend('CDS ' +
-                       JSON.stringify({channel: args[1], description: args[0]}));
-            } else {
-                wsSend('CDS ' +
-                       JSON.stringify({channel: curTab.id, description: args[0]}));
-            }
+            wsSend('CDS ' +
+                   JSON.stringify({channel: curTab.id, description: args[0]}));
 
             pass();
         },
@@ -1721,14 +1712,7 @@
             {
                 type: 'string',
                 ID: 'Description',
-                hint: 'A description of the channel.',
-                separate: true
-            },
-            {
-                type: 'string',
-                ID: 'Channel',
-                hint: 'A valid public/private channel name/id. (Optional)',
-                optional: true
+                hint: 'A description of the channel.'
             }
         ]
     };
