@@ -458,7 +458,12 @@ FList.Chat.commands['PRI'] = function (params)
     var message = params.message,
         messagetype = "chat",
         response,
-        tab = FList.Chat.TabBar.getTabFromId("user", params.character);
+        tab = FList.Chat.TabBar.getTabFromId("user", params.character),
+        responceObj = FList.Chat.Status.response,
+        lastStatus = FList.Chat.Status.lastStatus.status.toLowerCase(),
+        isValidStatus = (lastStatus !== "online" && lastStatus !== "looking"),
+        isSet = (responseObj.msg || (lastStatus === "idle" && responseObj.default)),
+        canAlert = !responseObj.alertedUsers[params.character];
 
     if (jQuery.inArray(params.character.toLowerCase(), FList.Chat.ignoreList) !== -1) {
         return FList.Connection.send("IGN " +
@@ -487,18 +492,12 @@ FList.Chat.commands['PRI'] = function (params)
                             to: FList.Chat.TabBar.getTabFromId('user', params.character),
                             from: params.character, type: messagetype});
 
-    if (FList.Chat.Status.response &&
-            FList.Chat.Status.lastStatus.status.toLowerCase() !== "online" &&
-            FList.Chat.Status.lastStatus.status.toLowerCase() !== "looking" &&
-            (FList.Chat.Status.response.msg ||
-            (FList.Chat.Status.lastStatus.status.toLowerCase() === "idle" &&
-            FList.Chat.Status.response.default)) &&
-            !FList.Chat.Status.response.alertedUsers[params.character]) {
+    if (isValidStatus && isSet && canAlert) {
 
-        response = (!FList.Chat.Status.response.msg) ?
-            FList.Chat.Status.response.default : FList.Chat.Status.response.msg;
+        response = (!responseObj.msg) ?
+            responseObj.default : responseObj.msg;
 
-        FList.Chat.Status.response.alertedUsers[params.character] = true;
+        responseObj.alertedUsers[params.character] = true;
 
         FList.Connection.send("PRI " +
                               JSON.stringify({recipient: params.character, message: 'Auto-response: ' + response}));
