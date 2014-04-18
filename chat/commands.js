@@ -459,7 +459,7 @@ FList.Chat.commands['PRI'] = function (params)
         messagetype = "chat",
         response,
         tab = FList.Chat.TabBar.getTabFromId("user", params.character),
-        responceObj = FList.Chat.Status.response,
+        responseObj = FList.Chat.Status.response,
         lastStatus = FList.Chat.Status.lastStatus.status.toLowerCase(),
         isValidStatus = (lastStatus !== "online" && lastStatus !== "looking"),
         isSet = (responseObj.msg || (lastStatus === "idle" && responseObj.default)),
