@@ -270,7 +270,7 @@
                     return fail('Parameter number ' + (i + 1) + ' is not an integer.', invoke);
                 }
 
-                if (!(curfmt.limit && num >= curfmt.limit[0] && num <= curfmt.limit[0])) {
+                if (!(curfmt.limit && num >= curfmt.limit[0] && num <= curfmt.limit[1])) {
                     return fail('Parameter number ' + (i + 1) +
                                     ' is out of range of specified numerical limits.', invoke);
                 }
@@ -560,8 +560,7 @@
             pass();
         },
         title: 'Timeout',
-        does: 'Temporarily rejects access to the chat client for a specified period of time that' +
-              'does not exceed 90 minutes. This is relative to the chat client specifically.',
+        does: 'Temporarily rejects access to the channel for a specified period of time.',
         params: [
             {
                 type: 'character',
@@ -592,8 +591,7 @@
             pass();
         },
         title: 'Gtimeout',
-        does: 'Temporarily rejects access to the chat client for a specified period of time that ' +
-              'does not exceed 90 minutes. This is relative to the chat client specifically.',
+        does: 'Temporarily rejects access to the chat client for a specified period of time.',
         params: [
             {
                 type: 'character',
