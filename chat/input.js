@@ -656,7 +656,7 @@
 
                 d = parseInt(dt[1], 10);
 
-                if (r > 9 || d < 1 || d > 500) {
+                if (dt.length > 1 && (r > 9 || d < 1 || d > 500)) {
                     return fail('Dice integers out of valid range.');
                 }
 
