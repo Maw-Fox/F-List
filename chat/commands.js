@@ -146,14 +146,25 @@ FList.Chat.commands['FLN'] = function (params)
         FList.Chat.TabBar.updateTooltip(printtab);
     }
 };
-FList.Chat.commands['CDS'] = function (params)
-{
-    FList.Chat.channels.getData(params.channel).description = params.description;
-    if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
-        FList.Chat.InfoBar.update();
+
+FList.Chat.commands.CDS = function(data) {
+    var local = FList.Chat,
+        callbackId = local.TabBar.waitFor.indexOf(data.channel),
+        tabData = local.channels.getData(data.channel);
+
+    tabData.description = data.description;
+
+    if (local.TabBar.activeTab.id === data.channel) {
+        local.InfoBar.update();
     }
-    FList.Chat.TabBar.updateTooltip(FList.Chat.TabBar.getTabFromId("channel", params.channel));
+
+    local.TabBar.updateTooltip(local.TabBar.getTabFromId("channel", data.channel));
+
+    if (callbackId !== -1) {
+        return FList.Chat.TabBar.queueResponse(callbackId);
+    }
 };
+
 FList.Chat.commands['CIU'] = function(params) {
     var message = params.sender + " has invited you to join [session=" + params.title + "]" + params.name + "[/session].";
     FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});

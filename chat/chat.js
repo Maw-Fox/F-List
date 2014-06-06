@@ -178,7 +178,7 @@ FList.Chat = {
 },
 openChannelChat: function(channel, dounescape){
     if (dounescape === true) channel = unescape(channel);
-    var channeldata=FList.Chat.channels.getData(channel);
+    var channeldata = FList.Chat.channels.getData(channel);
     if(!channeldata.created) FList.Chat.channels.create(channel, channel);
     var tab=FList.Chat.TabBar.getTabFromId("channel",channel);
     if(tab===false){
@@ -890,34 +890,112 @@ FList.Chat.TabBar = new function TabBar() {
 
     };
 
-    this.loadSavedTabs = function(){
-        //Translation to localStorage
-        if( typeof(Storage) !== "undefined" && localStorage["tabs_"+ FList.Chat.identity.toLowerCase().replace(/ /g,"_")]===undefined ) localStorage["tabs_"+ FList.Chat.identity.toLowerCase().replace(/ /g,"_")]=FList.Common_getCookie("tabs_"+ FList.Chat.identity.toLowerCase().replace(/ /g,"_"));
-        //
-        var savestring=localStorage["tabs_"+ FList.Chat.identity.toLowerCase().replace(/ /g,"_")];
-        if(savestring!=="" || FList.Chat.restoreTabs.length>0){//if there are saved tabs:
-            var savedata=JSON.parse(savestring);
-            $.each(savedata, function(i,save){
-                if(save.type==="channel"){
-                    FList.Chat.openChannelChat(save.id, false);
-                    var channel=FList.Chat.channels.getData(save.id);
-                    channel.title=save.title;
-                }
-                if(save.type==="user") FList.Chat.openPrivateChat(save.title, false);
-                if(FList.Chat.TabBar.getTabFromElement(FList.Chat.TabBar.getTabFromId(save.type, save.id).tab).pinned){
-                    FList.Chat.TabBar.getTabFromId(save.type, save.id).tab.children(".pin").addClass("pin-enabled");
-                } else {
-                    FList.Chat.TabBar.togglePin(FList.Chat.TabBar.getTabFromId(save.type, save.id).tab);
-                }
-            });
-            $.each(FList.Chat.restoreTabs, function(i,restore){ //if you got logged out, disconnected, etc, restore the tabs that were open just now. IF you log in with the same user.
-                if(restore.type==="channel"){
-                    FList.Chat.openChannelChat(restore.id, false);
-                }
-                if(restore.type==="user") FList.Chat.openPrivateChat(restore.id, false);
-            });
-            FList.Chat.restoreTabs=[];
+
+    /**
+     * JCH Queue Tick
+     */
+    this.queueTick = function() {
+        var local = FList.Chat.TabBar,
+            curTab = local.queue[0],
+
+        if (!curTab && !local.waitFor) {
+            return clearInterval(local.queueInit);
+        } else if (!curTab) {
+            return;
+        } else {
+            local.waitFor.push(curTab);
+
+            setTimeout(function() {
+                    var local = FList.Chat.TabBar,
+                        tabIndex = local.waitFor.indexOf(curTab);
+
+                    if (tabIndex === -1) {
+                        return;
+                    }
+
+                    local.waitFor.splice(tabIndex, 1);
+
+                    return local.queue.unshift(curTab);
+                }, 5000);
+
+            FList.Chat.channels.getData(curTab).title = ;
         }
+    };
+
+    /**
+     * Server Acknowledgement to queued JCH request.
+     *
+     * @params {Number} [tabIndex]
+     */
+    this.queueResponse = function(tabIndex) {
+        return FList.Chat.TabBar.waitFor.splice(tabIndex, 1);
+    };
+
+    /**
+     * JCH 'To Send' Queue
+     */
+    this.queue = [];
+
+    /**
+     * Tabs waiting for server acknowledgement and potential queue-repopulation.
+     */
+    this.waitFor = [];
+
+    /**
+     * Tab repopulation. (For both soft and hard logins)
+     */
+    this.loadSavedTabs = function() {
+        var userString = FList.Chat.identity.toLowerCase().replace(/ /g,"_"),
+            saveString = localStorage["tabs_" + userString],
+            saveData = JSON.parse(saveString);
+
+        if (typeof Storage !== "undefined" && saveString === undefined) {
+            localStorage["tabs_" + userString] = FList.Common_getCookie("tabs_" + userString);
+            saveString = localStorage["tabs_" + userString];
+            saveData = JSON.parse(saveString);
+        }
+
+        if (!saveString && !FList.Chat.restoreTabs.length) {
+            return;
+        }
+
+        if (!FList.Chat.restoreTabs.length && saveData) {
+            $.each(saveData,
+                function(i, curTab) {
+                    var chan,
+                        local = FList.Chat.TabBar,
+                        tabObj = local.getTabFromId(curTab.type, curTab.id).tab,
+                        isPinned = local.getTabFromElement(tabObj).pinned;
+
+                    if (curTab.type === "channel") {
+                        FList.Chat.TabBar.queue.push(curTab.id);
+                    } else if (curTab.type === "user") {
+                        FList.Chat.openPrivateChat(curTab.title, false);
+                    }
+
+                    if (isPinned) {
+                        tabObj.children(".pin")
+                              .addClass("pin-enabled");
+                    } else {
+                        local.togglePin(tabObj);
+                    }
+                });
+        } else {
+            $.each(FList.Chat.restoreTabs,
+                function(i, curTab) {
+                    if (curTab.type === "channel") {
+                        FList.Chat.TabBar.queue.push(curTab.id);
+                    } else if (curTab.type === "user") {
+                        FList.Chat.openPrivateChat(curTab.id, false);
+                    }
+                });
+
+            FList.Chat.restoreTabs = [];
+        }
+
+        return FList.Chat.TabBar.queueInit = setInterval(function() {
+                FList.Chat.TabBar.queueTick();
+            }, 1000);
     };
 
     this.saveTabs = function(){
