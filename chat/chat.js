@@ -915,10 +915,12 @@ FList.Chat.TabBar = new function TabBar() {
 
                     local.waitFor.splice(tabIndex, 1);
 
-                    return local.queue.unshift(curTab);
+                    local.queue.unshift(curTab);
+
+                    return FList.Chat.getData(curTab).joined = false;
                 }, 5000);
 
-            FList.Chat.channels.getData(curTab).title = ;
+            FList.Chat.openChannelChat(curTab, false);
         }
     };
 
