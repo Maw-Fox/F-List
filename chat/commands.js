@@ -214,16 +214,36 @@ FList.Chat.commands['ORS'] = function (params)
     }
 };
 
-FList.Chat.commands['FKS'] = function (params){
-    $(".chatui-tab-search .results").html("");
-    var reshtml="";
-    $.each(params.characters, function(i,name){
-        reshtml+=FList.Chat.users.getToggleLink(name);
-    });
-    $(".chatui-tab-search .results").html(reshtml);
-    $("#search-panel-go").val("Search").attr("disabled",false);
-};
+/**
+ * FKS
+ * Returned search results
+ *
+ * @params {Object} [data]
+ *   @params {Array} [characters]
+ *   @params {Array} [kinks] (Enumerated)
+ */
+FList.Chat.commands.FKS = function(data) {
+    var reshtml = "";
 
+    $(".chatui-tab-search .results").html("Processing results.");
+
+    $.each(data.characters,
+        function(i, character) {
+            if (FList.Chat.users.userdata[character.toLowerCase()].status === "Looking") {
+                data.characters.splice(i, 1);
+                data.characters.unshift(character);
+            }
+        });
+
+    $.each(data.characters,
+        function(i, character) {
+            reshtml += FList.Chat.users.getToggleLink(character);
+        });
+
+    $(".chatui-tab-search .results").html(reshtml);
+
+    $("#search-panel-go").val("Search").attr("disabled", false);
+};
 
 
 FList.Chat.commands['CHA'] = function (params)
