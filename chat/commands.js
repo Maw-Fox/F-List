@@ -149,7 +149,6 @@ FList.Chat.commands['FLN'] = function (params)
 
 FList.Chat.commands.CDS = function(data) {
     var local = FList.Chat,
-        callbackId = local.TabBar.waitFor.indexOf(data.channel),
         tabData = local.channels.getData(data.channel);
 
     tabData.description = data.description;
@@ -159,10 +158,6 @@ FList.Chat.commands.CDS = function(data) {
     }
 
     local.TabBar.updateTooltip(local.TabBar.getTabFromId("channel", data.channel));
-
-    if (callbackId !== -1) {
-        return FList.Chat.TabBar.queueResponse(callbackId);
-    }
 };
 
 FList.Chat.commands['CIU'] = function(params) {
