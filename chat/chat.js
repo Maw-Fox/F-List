@@ -916,7 +916,7 @@ FList.Chat.TabBar = new function TabBar() {
                         isPinned = local.getTabFromElement(tabObj).pinned;
 
                     if (curTab.type === "channel") {
-                        FList.Chat.openChannelChat(curTab, false)
+                        FList.Chat.openChannelChat(curTab.id, false)
                     } else if (curTab.type === "user") {
                         FList.Chat.openPrivateChat(curTab.title, false);
                     }
