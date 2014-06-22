@@ -1527,18 +1527,25 @@ FList.Chat.Sound = {
 
 FList.Chat.Notifications = {
     init: function(){
-        if(window.webkitNotifications){
+        if (window.webkitNotifications) {
             window.webkitNotifications.requestPermission();
+        } else if (window.chrome.notifications) {
+            chrome.notifications.onClicked.addListener(function (){
+                tabInstance();
+                window.focus();
+            });
         } else if (window.Notification) {
             Notification.requestPermission(function (status) {
-                if (Notification.permission !== status) {
-                    Notification.permission = status;
-                }
-            });
+                    if (Notification.permission !== status) {
+                        Notification.permission = status;
+                    }
+                });
         }
     },
-    message: function(title, message, image, tabInstance){
-        if(window.webkitNotifications){
+    message: function(title, message, image, tabInstance) {
+        var valid;
+
+        if (window.webkitNotifications) {
             if(window.webkitNotifications.checkPermission() === 0){
                 var instance=window.webkitNotifications.createNotification(image,title, message.substr(0,100));
                 instance.onclick = function() {
@@ -1552,6 +1559,28 @@ FList.Chat.Notifications = {
 
                 instance.show();
             }
+        } else if (window.chrome.notifications) {
+            valid = chrome.notifications.getPermissionLevel(function(status) {
+                    return status === 'granted';
+                });
+
+            if (valid) {
+                valid = chrome.notifications.create(
+                        'F-Chat 2.0',
+                        {
+                            type: 'basic',
+                            title: title,
+                            message: message.substr(0,97) + '...',
+                            iconUrl: image
+                        },
+                        function (notificationId) {
+                            return notificationId;
+                    });
+
+                setTimeout(function(){
+                        chrome.notifications.clear(valid, function(){});
+                    }, 10000);
+            }
         } else if (window.Notification) {
             if (Notification.permission === "granted") {
                 (function() {
@@ -1564,6 +1593,7 @@ FList.Chat.Notifications = {
                     );
                     instance.onclick = function() {
                         tabInstance();
+                        window.focus();
                     };
                     setTimeout(instance.close(), 10000);
                 }());
