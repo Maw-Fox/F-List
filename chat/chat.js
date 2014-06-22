@@ -1531,9 +1531,9 @@ FList.Chat.Notifications = {
             window.webkitNotifications.requestPermission();
         } else if (window.chrome.notifications) {
             chrome.notifications.onClicked.addListener(function (){
-                tabInstance();
-                window.focus();
-            });
+                    tabInstance();
+                    window.focus();
+                });
         } else if (window.Notification) {
             Notification.requestPermission(function (status) {
                     if (Notification.permission !== status) {
