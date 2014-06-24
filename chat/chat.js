@@ -242,7 +242,7 @@ FList.Chat.Settings = {
         $(".ui-settings-alertsfortickets").attr("checked", FList.Chat.Settings.current.alertsForTickets);
         $(".ui-settings-alertsforfeatures").attr("checked", FList.Chat.Settings.current.alertsForFeatures);
         $(".ui-settings-alertsforgrouprequests").attr("checked", FList.Chat.Settings.current.alertsForGrouprequests);
-        $(".ui-settings-highlightwords").val(FList.Chat.Settings.current.highlightWords.join(" "));
+        $(".ui-settings-highlightwords").val(FList.Chat.Settings.current.highlightWords.join(","));
         $(".ui-settings-flashTabIndicate").attr("checked", FList.Chat.Settings.current.flashTabIndicate);
     },
     savePanel: function(){
@@ -267,7 +267,7 @@ FList.Chat.Settings = {
         var alertsForGrouprequests=$(".ui-settings-alertsforgrouprequests:checked").length>0 ? true : false;
         var keepTypingFocus=$(".ui-settings-keeptypingfocus:checked").length>0 ? true : false;
         var tabsOnTheSide=$(".ui-settings-tabsontheside:checked").length>0 ? true : false;
-        var highlightWords=$(".ui-settings-highlightwords").val().split(" ");
+        var highlightWords=$(".ui-settings-highlightwords").val().split(",");
         var flashTabIndicate=$(".ui-settings-flashTabIndicate:checked").length>0 ? true : false;
         if(highlightWords[0]==="") highlightWords=[];
         FList.Chat.Settings.current.fontSize=fontSize;
@@ -1308,8 +1308,7 @@ FList.Chat.printMessage = function(args) {
     args.msg = this.processMessage(args.to.type, args.type, args.msg);
 
     if (this.Settings.current.highlightMentions &&
-       (args.type === "chat" || args.type !== "ad" || args.type !== "rp")) {
-
+       (args.type === 'chat' || args.type === 'rp' || args.type === 'ad')) {
             for (i = 0; i < this.Settings.current.highlightWords.length; ++i) {
                 regx = new RegExp("\\b" +
                                 this.Settings.current.highlightWords[i] +
@@ -1321,14 +1320,6 @@ FList.Chat.printMessage = function(args) {
                 }
 
             }
-
-            regx = new RegExp("\\b" + this.identity + "('s)?\\b", "i");
-
-            if (!highlight && regx.test(args.msg) &&
-                this.from !== this.identity && args.to.type === "channel") {
-                    highlight = true;
-            }
-
     }
 
     if (highlight) {
