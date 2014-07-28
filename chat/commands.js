@@ -479,60 +479,61 @@ FList.Chat.commands['LRP'] = function (params)
     $("#ads-panel-list").append("<div class='panel'><span class='" + linkclasses + "'><span class='rank'></span>" + params.character + "</span>:" + FList.ChatParser.parseContent(message) + "</div>");
     if($("#ads-panel-list > div").length>25){ $("#ads-panel-list:first").remove(); }
 };
-FList.Chat.commands['PRI'] = function (params)
-{
-    var message = params.message,
-        messagetype = "chat",
-        response,
-        tab = FList.Chat.TabBar.getTabFromId("user", params.character),
-        responseObj = FList.Chat.Status.response,
-        lastStatus = FList.Chat.Status.lastStatus.status.toLowerCase(),
-        isValidStatus = (lastStatus !== "online" && lastStatus !== "looking"),
-        isSet = (responseObj.msg || (lastStatus === "idle" && responseObj.default)),
-        canAlert = !responseObj.alertedUsers[params.character];
 
-    if (jQuery.inArray(params.character.toLowerCase(), FList.Chat.ignoreList) !== -1) {
-        return FList.Connection.send("IGN " +
-                                     JSON.stringify({action: 'notify', character: params.character}));
-    }
+FList.Chat.commands.PRI = function (params) {
+    var local = FList.Chat,
+        message,
+        messagetype,
+        tab,
+        isIgnored = (
+            $.inArray(
+                params.character.toLowerCase(), local.ignoreList
+            ) !== -1
+        );
 
+    if (isIgnored)
+        return FList.Connection.send(
+            'IGN ' + JSON.stringify({
+                action: 'notify',
+                character: params.character
+            })
+        );
 
-    if (FList.Chat.Roleplay.isRoleplay(message)) {
+    message = params.message;
+
+    messagetype = 'chat';
+
+    if (local.Roleplay.isRoleplay(message)) {
         message = message.substring(3);
-        messagetype = "rp";
+        messagetype = 'rp';
     }
+
+    tab = local.TabBar.getTabFromId('user', params.character.toLowerCase());
 
     if (!tab) {
-        FList.Chat.openPrivateChat(params.character, false);
+        local.openPrivateChat(params.character, false);
     } else {
         tab.tab.children(".tpn").removeClass("tpn-paused").hide();
-
-        if (tab.closed)
-        {
+        if (tab.closed) {
             tab.tab.show();
             tab.closed = false;
         }
     }
 
-    FList.Chat.printMessage({msg: FList.Chat.Input.sanitize(message),
-                            to: FList.Chat.TabBar.getTabFromId('user', params.character),
-                            from: params.character, type: messagetype});
+    local.Logs.saveLogs(
+        params.character,
+        {
+            msg: message,
+            kind: messagetype,
+            to: params.character.toLowerCase()
+        }
+    );
 
-    if (isValidStatus && isSet && canAlert) {
-
-        response = (!responseObj.msg) ?
-            responseObj.default : responseObj.msg;
-
-        responseObj.alertedUsers[params.character] = true;
-
-        FList.Connection.send("PRI " +
-                              JSON.stringify({recipient: params.character, message: 'Auto-response: ' + response}));
-
-        FList.Chat.printMessage({msg: 'Auto-response: ' + FList.Chat.Input.sanitize(response),
-                                to: FList.Chat.TabBar.getTabFromId('user', params.character),
-                                from: FList.Chat.identity,
-                                type: 'chat'});
-    }
+    local.printMessage({
+        msg: message,
+        to: local.TabBar.getTabFromId('user', params.character),
+        from: params.character, type: messagetype
+    });
 };
 
 FList.Chat.commands['NLN'] = function (params)

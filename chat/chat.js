@@ -156,7 +156,7 @@ FList.Chat = {
 
     },
 
-    openPrivateChat: function(name, dounescape){
+    openPrivateChat: function (name, dounescape) {
         if(name.toLowerCase()===FList.Chat.identity.toLowerCase()) return;
         if (dounescape === true) name = unescape(name);
         var tab=FList.Chat.TabBar.getTabFromId("user",name);
@@ -170,35 +170,39 @@ FList.Chat = {
                 tab.closed=false;
                 FList.Chat.Activites.flash(tab.tab,255,255,255,300);
             } else {
-            FList.Chat.TabBar.setActive("user", name);
+                FList.Chat.TabBar.setActive("user", name);
+            }
         }
-    }
-    if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
-},
-openChannelChat: function(channel, dounescape){
-    if (dounescape === true) channel = unescape(channel);
-    var channeldata = FList.Chat.channels.getData(channel);
-    if(!channeldata.created) FList.Chat.channels.create(channel, channel);
-    var tab=FList.Chat.TabBar.getTabFromId("channel",channel);
-    if(tab===false){
-        FList.Chat.TabBar.addTab("channel",channel,channel);
-        tab=FList.Chat.TabBar.getTabFromId("channel",channel);
-        FList.Chat.Activites.flash(tab.tab,255,255,255,300);
-    } else {
-        if(tab.closed){
-            tab.tab.show();
-            tab.closed=false;
+        if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
+
+        if (!tab.initLogs) {
+            FList.Chat.Logs.buildLogs(name);
+        }
+    },
+    openChannelChat: function(channel, dounescape){
+        if (dounescape === true) channel = unescape(channel);
+        var channeldata = FList.Chat.channels.getData(channel);
+        if(!channeldata.created) FList.Chat.channels.create(channel, channel);
+        var tab=FList.Chat.TabBar.getTabFromId("channel",channel);
+        if(tab===false){
+            FList.Chat.TabBar.addTab("channel",channel,channel);
+            tab=FList.Chat.TabBar.getTabFromId("channel",channel);
             FList.Chat.Activites.flash(tab.tab,255,255,255,300);
         } else {
-            FList.Chat.TabBar.setActive("channel", channel);
+            if(tab.closed){
+                tab.tab.show();
+                tab.closed=false;
+                FList.Chat.Activites.flash(tab.tab,255,255,255,300);
+            } else {
+                FList.Chat.TabBar.setActive("channel", channel);
+            }
         }
-    }
-    if(!channeldata.joined) {
-        FList.Connection.send("JCH " + JSON.stringify({ "channel": channel }));
-    }
-    if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
-},
-scrollDown: function(){ $("#chat-content-chatarea > div").scrollTop($("#chat-content-chatarea > div").prop("scrollHeight") - $('#chat-content-chatarea > div').height()); }
+        if(!channeldata.joined) {
+            FList.Connection.send("JCH " + JSON.stringify({ "channel": channel }));
+        }
+        if(FList.Chat.Settings.current.keepTypingFocus) $("#message-field").focus();
+    },
+    scrollDown: function(){ $("#chat-content-chatarea > div").scrollTop($("#chat-content-chatarea > div").prop("scrollHeight") - $('#chat-content-chatarea > div').height()); }
 };
 
 FList.Chat.Settings = {
@@ -218,7 +222,7 @@ FList.Chat.Settings = {
         else FList.Chat.Settings.current=JSON.parse(settingsString);
     },
     getPanel: function(){
-        return "<div class='StyledForm'><div class='group'><div class='settings-tab-label'><span>Layout & Display</span></div><p><span class='label'>Display limit</span><span class='element'><input type='text' maxlength='5' size='5' class='ui-settings-visiblelines'/></span></p><p><span class='label'>Tabs on the side</span><span class='element'><input type='checkbox' class='ui-settings-tabsontheside'/></span></p><p><span class='label'>Disable userlist</span><span class='element'><input type='checkbox' class='ui-settings-disableuserlist'/></span></p><p><span class='label'>Keep focus on typing area.</span><span class='element'><input type='checkbox' class='ui-settings-keeptypingfocus'/></span></p><p><span class='label'>Font size</span><span class='element'><input type='text' maxlength='3' size='3' class='ui-settings-fontsize'/></span></p><p><span class='label'>Highlight messages</span><span class='element'><input type='checkbox' class='ui-settings-highlightmentions'/></span></p><p><span class='label'>Highlight Words</span><span class='element'><input type='text' maxlength='255' size='12' class='ui-settings-highlightwords'/></span></p><p><span class='label'>Auto-parse URLs</span><span class='element'><input type='checkbox' class='ui-settings-autoparseurls'/></span></p></div><div class='group'><div class='settings-tab-label'><span>Functionality</span></div><p><span class='label'>HTML5 Audio</span><span class='element'><input type='checkbox' class='ui-settings-html5audio'/></span></p><p><span class='label'>Join/Leave messages</span><span class='element'><input type='checkbox' class='ui-settings-joinleavealerts'/></span></p><p><span class='label'>Disable [icon] tag</span><span class='element'><input type='checkbox' class='ui-settings-disableicontag'/></span></p><p><span class='label'>HTML5 Notifications</span><span class='element'><input type='checkbox' class='ui-settings-html5notifications'/></span></p><p><span class='label'>Auto Idle</span><span class='element'><input type='checkbox' class='ui-settings-autoidle'/></span></p><p><span class='label'>Idle time(ms)</span><span class='element'><input type='text' maxlength='7' size='6' class='ui-settings-autoidletime'/></span></p><p><span class='label'>Enable Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablelogging'/><p><span class='label'>Enable PM Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablepmlogging'/></span></p><p><span class='label'>Clear PM Logs</span><span class='element'><input type='button' onclick='FList.Chat.Logs.Delete()' class='ui-settings-clearStorage ui-button ui-widget ui-state-default ui-corner-all' value='clear' style='position:relative;height:100%;width:100%;padding:0px;'/></span></p><p><span class='label'>Friend notifications</span><span class='element'><input type='checkbox' class='ui-settings-friendnotifications'/></span></p><p><span class='label'>Alerts for bug reports</span><span class='element'><input type='checkbox' class='ui-settings-alertsforbugreports'/></span></p><p><span class='label'>Alerts for helpdesk tickets</span><span class='element'><input type='checkbox' class='ui-settings-alertsfortickets'/></span></p><p><span class='label'>Alerts for group requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforgrouprequests'/></span></p><p><span class='label'>Alerts for feature requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforfeatures'/></span></p><p><span class='label'>Left click opens f-list profile</span><span class='element'><input type='checkbox' class='ui-settings-leftclickopensflist'/></span></p><p><span class='label'>Animated Tab Activity</span><span class='element'><input type='checkbox' class='ui-settings-flashTabIndicate'/></span></p></div><div class='group'><p><input type='button' id='settings-panel-save' value='Save' onclick='FList.Chat.Settings.savePanel();'/><input type='button' id='settings-panel-reset' value='Reset' onclick='FList.Chat.Settings.resetPanel();'/></p></div></div>";
+        return "<div class='StyledForm'><div class='group'><div class='settings-tab-label'><span>Layout & Display</span></div><p><span class='label'>Display limit</span><span class='element'><input type='text' maxlength='5' size='5' class='ui-settings-visiblelines'/></span></p><p><span class='label'>Tabs on the side</span><span class='element'><input type='checkbox' class='ui-settings-tabsontheside'/></span></p><p><span class='label'>Disable userlist</span><span class='element'><input type='checkbox' class='ui-settings-disableuserlist'/></span></p><p><span class='label'>Keep focus on typing area.</span><span class='element'><input type='checkbox' class='ui-settings-keeptypingfocus'/></span></p><p><span class='label'>Font size</span><span class='element'><input type='text' maxlength='3' size='3' class='ui-settings-fontsize'/></span></p><p><span class='label'>Highlight messages</span><span class='element'><input type='checkbox' class='ui-settings-highlightmentions'/></span></p><p><span class='label'>Highlight Words</span><span class='element'><input type='text' maxlength='255' size='12' class='ui-settings-highlightwords'/></span></p><p><span class='label'>Auto-parse URLs</span><span class='element'><input type='checkbox' class='ui-settings-autoparseurls'/></span></p></div><div class='group'><div class='settings-tab-label'><span>Functionality</span></div><p><span class='label'>HTML5 Audio</span><span class='element'><input type='checkbox' class='ui-settings-html5audio'/></span></p><p><span class='label'>Join/Leave messages</span><span class='element'><input type='checkbox' class='ui-settings-joinleavealerts'/></span></p><p><span class='label'>Disable [icon] tag</span><span class='element'><input type='checkbox' class='ui-settings-disableicontag'/></span></p><p><span class='label'>HTML5 Notifications</span><span class='element'><input type='checkbox' class='ui-settings-html5notifications'/></span></p><p><span class='label'>Auto Idle</span><span class='element'><input type='checkbox' class='ui-settings-autoidle'/></span></p><p><span class='label'>Idle time(ms)</span><span class='element'><input type='text' maxlength='7' size='6' class='ui-settings-autoidletime'/></span></p><p><span class='label'>Enable Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablelogging'/><p><span class='label'>Enable PM Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablepmlogging'/></span></p><p><span class='label'>Clear PM Logs</span><span class='element'><input type='button' onclick='FList.Chat.Logs.clearLogs()' class='ui-settings-clearStorage ui-button ui-widget ui-state-default ui-corner-all' value='clear' style='position:relative;height:100%;width:100%;padding:0px;'/></span></p><p><span class='label'>Friend notifications</span><span class='element'><input type='checkbox' class='ui-settings-friendnotifications'/></span></p><p><span class='label'>Alerts for bug reports</span><span class='element'><input type='checkbox' class='ui-settings-alertsforbugreports'/></span></p><p><span class='label'>Alerts for helpdesk tickets</span><span class='element'><input type='checkbox' class='ui-settings-alertsfortickets'/></span></p><p><span class='label'>Alerts for group requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforgrouprequests'/></span></p><p><span class='label'>Alerts for feature requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforfeatures'/></span></p><p><span class='label'>Left click opens f-list profile</span><span class='element'><input type='checkbox' class='ui-settings-leftclickopensflist'/></span></p><p><span class='label'>Animated Tab Activity</span><span class='element'><input type='checkbox' class='ui-settings-flashTabIndicate'/></span></p></div><div class='group'><p><input type='button' id='settings-panel-save' value='Save' onclick='FList.Chat.Settings.savePanel();'/><input type='button' id='settings-panel-reset' value='Reset' onclick='FList.Chat.Settings.resetPanel();'/></p></div></div>";
     },
     initPanel: function(){
         $(".ui-settings-fontsize").val(FList.Chat.Settings.current.fontSize);
@@ -811,11 +815,10 @@ FList.Chat.TabBar = new function TabBar() {
     this.activeTab=false;//otherwise contains a reference to the active tab with ALL data. handy :3
     this.lastClose=false;
 
-    this.printLogs = function(tab, mode){
+    this.printLogs = function (tab, mode) {
         var html,logs,cutoff;
         html = "";
         logs = [];//grab last amount of visible logs
-        FList.Chat.Logs.Draw(tab.id,tab);
         $("#chat-content-chatarea > div").html(tab.logs.length===0 ? "&nbsp;" : "");
         if(tab.logs.length>0){
             cutoff=tab.logs.length>=FList.Chat.Settings.current.visibleLines ? tab.logs.length-FList.Chat.Settings.current.visibleLines : 0;
@@ -1447,8 +1450,6 @@ FList.Chat.printMessage = function(args) {
         tab.logs.push({"type": args.type ,"by": args.from, "html": html, scheduledDeletion: true});
     }
 
-    FList.Chat.Logs.Store(tab);
-
     if (args.from !== "System" &&
        (args.to.type === "user" || highlight) &&
        (!wfocus || tabFocus !== args.to.id.toLowerCase())) {
@@ -1778,131 +1779,332 @@ FList.Chat.staffAlert = {
     }
 };
 
-FList.Chat.Logs = {
-    Draw: function(uid,tab){
-        var lsArray,x,acct,acctStr;
-        acct = FList.Chat.identity;
-        acctStr = acct+"_"+uid;
-        if( tab.type==="user" && tab.hasRendered === undefined && (typeof(Storage)!=="undefined") && FList.Chat.Settings.current.enablePMLogging === true ){
-            tab.hasRendered = true;
-            if(localStorage[acctStr] !== undefined){
-                lsArray = localStorage[acctStr].split(",");
-                for(i=0;i<lsArray.length;i++){
-                    lsArray[i] = unescape(lsArray[i]);
-                }
-                if(tab.localLogsOffset === undefined){
-                    tab.localLogsOffset = 0;
-                }
-                for(i=(0+tab.localLogsOffset);i<lsArray.length;i++){
-                    x=$([]);
-                    x["html"]=lsArray[i];
-                    x["by"]=lsArray[i].split("></span>")[1].split("</span>")[0];
-                    x["type"]=lsArray[i].split("chat-type-")[1].split(" ")[0].split("'")[0];
-                    tab.logs.unshift(x);
+/**
+ * Offline Log Cleaner
+ */
+(function (local) {
+    var WEEK = 604800000,
+        curObj; // milliseconds in a week
+
+    for (var cur in localStorage) {
+        if (cur.indexOf(local.identity) === 0) {
+            if (localStorage[cur].charAt(0) !== '{') {
+                delete localStorage[cur];
+            } else {
+                curObj = JSON.parse(localStorage[cur]);
+
+                if (new Date().getTime() - curObj.last > WEEK) {
+                    delete localStorage[cur];
                 }
             }
         }
-    },
-    Delete: function(){
-        if(typeof(Storage)!==undefined){
-            for(var i in localStorage){
-                if(i.match(/_last/gi)){
-                    delete localStorage[i];
-                    delete localStorage[(i.replace("_last",""))];
-                }
+    }
+}(FList.Chat));
+
+/**
+ * Offline logging/Log-getters
+ */
+FList.Chat.Logs = (function (local) {
+    return {
+        /**
+         * Append private messaging logs to offline file.
+         * This function is passed raw PRI data.
+         * PRI is already HTML sanitized server-side prior to sending.
+         * @params {String} [user] -- Not lowercase.
+         * @params {Object} [msgData]
+         */
+        saveLogs: function (user, msgData) {
+            var LS_PTR = local.identity + '_' + msgData.to,
+                NEW_LOG_OBJ = {
+                    at: new Date().getTime(),
+                    msg: msgData.msg,
+                    from: user,
+                    kind: msgData.kind
+                },
+                BUFFER_LIMIT = parseInt(
+                    local.Settings.current.visibleLines, 10
+                ),
+                isValid = (
+                    local.Settings.current.enablePMLogging &&
+                    typeof Storage !== 'undefined'
+                ),
+                isCorrectFormat = (
+                    localStorage[LS_PTR] &&
+                    localStorage[LS_PTR].charAt(0) === '{'
+                ),
+                lsData;
+
+            if (!isValid) return;
+
+            if (!isCorrectFormat) {
+                localStorage[LS_PTR] = '{"logs":[],"last":0}';
             }
-        }
-    },
-    Store: function(tab){
-        if( tab.type==="user" && typeof(Storage)!==undefined && FList.Chat.Settings.current.enablePMLogging === true &&tab.logs[(tab.logs.length-1)]["by"] !== "System"){
-            var lsArray,uid,acct,acctStr,time,x,y,m;
-            acct = FList.Chat.identity;
-            x = new Date();
-            y = (x.getDate()<10) ? "0"+x.getDate(): x.getDate();
-            m = ((x.getMonth()+1)<10) ? "0"+(x.getMonth()+1): (x.getMonth()+1);
-            time = Math.floor((new Date()).getTime()/1000);
-            uid = tab.id;
-            acctStr = acct+"_"+uid;
-            if(localStorage[acctStr] !== undefined){
-                var lsArray = localStorage[acctStr].split(",");
-                if (lsArray.length > 100){
-                    lsArray.pop();
+
+            lsData = JSON.parse(localStorage[LS_PTR]);
+
+            if (lsData.logs.length + 1 > BUFFER_LIMIT) {
+                lsData.logs = lsData.logs.slice(0, BUFFER_LIMIT - 1);
+            }
+
+            lsData.logs.unshift(NEW_LOG_OBJ);
+
+            lsData.last = new Date().getTime();
+
+            return localStorage[LS_PTR] = JSON.stringify(lsData);
+        },
+        /**
+         * Build tab log object from offline data prior to rendering
+         * Requires BBCode/HTML parsing on appended log entries. (For now)
+         * @params {String} [user] -- Not lowercase
+         */
+        buildLogs: function (user) {
+            var TARGET_TAB = local.TabBar.getTabFromId(
+                    'user',
+                    user.toLowerCase()
+                ),
+                LS_PTR = local.identity + '_' + user.toLowerCase(),
+                lsData,
+                bufferLimit,
+                curMsg;
+
+            /**
+             * Integer padding and conversion
+             * @params {Number} [n]
+             * @returns {String}
+             */
+            function paddedItoa(n) {
+                return ((n < 10) ? '0' + n : '' + n);
+            }
+
+            /**
+             * Building of message HTML per log message.
+             * @params {Object} [time]
+             * @params {String} [type]
+             * @params {String} [user] -- Not lowercase
+             * @params {String} [message]
+             * @returns {String}
+             */
+            function buildMessage(time, type, user, message) {
+                var container = $('<div>'),
+                    timestamp = $('<span>'),
+                    userClass = $('<span>'),
+                    msgContainer,
+                    htmlString = '';
+
+                container.addClass('chat-message');
+
+                timestamp.addClass('timestamp');
+
+                userClass.addClass(
+                    local.getPrintClasses(user.toLowerCase(), false)
+                );
+
+                userClass.html(user);
+
+                timestamp.html(
+                    '[' + time.getFullYear() + '/' +
+                    paddedItoa(time.getMonth() + 1) + '/' +
+                    paddedItoa(time.getDate()) + ']'
+                );
+
+                container.append(timestamp);
+
+                message = local.processMessage('user', type, message);
+
+                if (type === 'rp') {
+                    container.addClass('chat-type-rp');
+
+                    container.append($('<i>'));
+
+                    msgContainer = container.children('i');
+                } else {
+                    container.addClass('chat-type-chat');
+
+                    msgContainer = container;
                 }
 
-                if(tab.hasRendered === undefined){
-                    if(tab.localLogsOffset !== undefined){
-                        tab.localLogsOffset = tab.localLogsOffset+1;
-                    }else{
-                        tab.localLogsOffset = 1;
-                    }
-                }
-                localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = (escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3"))) +","+ lsArray.join());
-            } else {
-                if(tab.hasRendered === undefined){
-                    if(tab.localLogsOffset !== undefined){
-                        tab.localLogsOffset = tab.localLogsOffset+1;
-                    }else{
-                        tab.localLogsOffset = 1;
-                    }
-                }
-                localStorage[acctStr+"_last"] = time;
-                localStorage[acctStr] = escape(tab.logs[(tab.logs.length-1)]["html"].replace(/(.+\>\[)([0-9]{1,2}:[0-9]{1,2})(\]\<.+)/gi,("$1"+x.getFullYear()+"/"+m+"/"+y+"$3")));
+                msgContainer.append(userClass);
+
+                msgContainer.append(
+                    (type === 'rp' ? '': ':')
+                    + message
+                );
+
+                htmlString = $('<div>').append(container).html();
+
+                return htmlString;
             }
-            if(localStorage["nextPreen"]===undefined){localStorage["nextPreen"] = time+86400;}
-            if(parseInt(localStorage["nextPreen"])<time){
-                for(var prop in localStorage){
-                    if(prop.match(/_last/gi)){
-                        if((parseInt(localStorage[prop])+604800)<=time){
-                            delete localStorage[prop];
-                            delete localStorage[(prop.replace("_last",""))];
-                        }
-                    }
-                }
-                localStorage.nextPreen = time+86400;
+
+            TARGET_TAB.initLogs = true;
+
+            if (!localStorage[LS_PTR]) return;
+
+            lsData = JSON.parse(localStorage[LS_PTR]);
+
+            bufferLimit = Math.min(
+                parseInt(local.Settings.current.visibleLines, 10),
+                lsData.logs.length
+            );
+
+            for (var i = 0; i < bufferLimit; i++) {
+                curMsg = lsData.logs[i];
+
+                TARGET_TAB.logs.push({
+                    type: curMsg.kind,
+                    by: curMsg.user,
+                    html: buildMessage(
+                        new Date(curMsg.at),
+                        curMsg.kind,
+                        curMsg.from,
+                        curMsg.msg
+                    )
+                });
             }
+        },
+        /**
+         * Clearing of offline logs (Character Specific)
+         */
+        clearLogs: function () {
+            if (typeof Storage !== 'undefined') {
+                for (var cur in localStorage) {
+                    if (cur.indexOf(local.identity) === 0)
+                        delete localStorage[cur];
+                }
+            }
+        },
+        element: 0,
+        getPanel: function() {
+            return '<div id="chat-logs-list"><h2>Download Logs</h2>' +
+                '<p style="padding:10px;">Formerly saved logs can be ' +
+                'viewed in <a href="logs.php" target="_blank">' +
+                'the log viewer</a>. Alternatively, ' +
+                '<a onclick="FList.Chat.Logs.generateZip();" href="#">' +
+                'download a zip file with all your tab\'s logs</a>' +
+                '.</p><div class="chat-logs-list-content"></div></div>';
+        },
+        generateZip: function generateZip() {
+            var zip = new JSZip(),
+                folder,
+                tabs = local.TabBar.list,
+                tabLogs = {},
+                selectedTabs;
+
+            /**
+             * Populates an array with the person's custom zip selections.
+             * @returns {Array}
+             */
+            function getCustomSelected() {
+                var selection = [],
+                    defaultSelection = [];
+
+                $('.chat-log-item').each(function (i, el) {
+                    var element_id = $(el).children('input').attr('id'),
+                        element_ref = unescape(element_id.replace(/\_/g, '%'));
+
+                    if ($('#' + element_id + ':checked').length) {
+                        selection.push(element_ref);
+                    }
+
+                    defaultSelection.push(element_ref);
+                });
+
+                if (!selection.length) {
+                    return defaultSelection;
+                }
+
+                return selection;
+            }
+
+            selectedTabs = getCustomSelected();
+
+            /**
+             * Generates an optimized and easier-to-navigate Object.
+             */
+            for (var i = 0, ii = tabs.length; i < ii; i++) {
+                if (selectedTabs.indexOf(tabs[i].tab[0].title) !== -1) {
+                        tabLogs[tabs[i].tab[0].title] = tabs[i].logs;
+                }
+            }
+
+            /**
+             * Generates raw log-file contents
+             * @params {String} [tab]
+             */
+            function generateLogFile(tab) {
+                var fileContents = ""; // Large String File Output
+
+                tab = tabLogs[tab];
+
+                for (var i = 0, ii = tab.length; i < ii; i++) {
+                    fileContents += '>> ' +
+                        tab[i].html.replace(/\<[^\>]+\>/g, '')
+                            .replace(/\&lt\;/gi, '<')
+                            .replace(/\&gt\;/gi, '>')
+                            .replace(/\&amp\;/gi, '&')
+                        + '\n';
+                }
+
+                return fileContents;
+            }
+
+            for (var i = 0, ii = selectedTabs.length; i < ii; i++) {
+                folder = zip.folder(
+                    selectedTabs[i].replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                );
+                folder.add(
+                    ~~(new Date().getTime() / 1000) + '_' +
+                    selectedTabs[i]
+                        .replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>') + '.txt',
+                    generateLogFile(selectedTabs[i])
+                );
+            }
+
+            zip = zip.generate();
+
+            window.open(
+                'data:application/zip;filename=logs.zip;base64,' + zip
+            );
+
+            FList.Common_displayNotice(
+                'Download started. Rename the "download(n)" file to ' +
+                '"something.zip", and you will be able to open it ' +
+                'for later viewing.'
+            );
+        },
+        getLogDocument: function(tab) {
+            var tabname = tab.id,
+                doc = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ' +
+                    'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1' +
+                    '-strict.dtd">\n<html xmlns="http://www.w3.org/1999/' +
+                    'xhtml" xml:lang="en" lang="en">\n<head><title>F-lis' +
+                    't - Chat</title>\n<style>\nh1{color:white;margin-bo' +
+                    'ttom:10px;font-size:14pt;}\nbody{background-color:#' +
+                    '1F5284;font-family:verdana,helvetica;font-size:10pt' +
+                    ';}\nbody{color:#FFFFFF;font-family:verdana,helvetic' +
+                    'a;font-size:10pt;}\n</style>\n</head>\n<body>\n<h1>' +
+                    'F-Chat Log: ' + tabname + ', ' + new Date() + '</h1' +
+                    '>\n<div id="LogContainer">\n';
+
+            if (tab.type === 'channel')
+                tabname = FList.Chat.channels.getData(tab.id).title;
+
+            if (tab.type === 'user')
+                tabname=FList.Chat.users.getData(tab.id).name;
+
+            for (var l = 0; l < tab.logs.length; l++) {
+                doc += tab.logs[l].html;
+            }
+
+            doc += '</div></body></html>';
+
+            return doc;
         }
-    },
-    element: 0,
-    getPanel: function(){
-        return '<div id="chat-logs-list"><h2>Download Logs</h2><p style="padding:10px;">Formerly saved logs can be viewed in <a href="logs.php" target="_blank">the log viewer</a>. Alternatively, <a onclick="FList.Chat.Logs.getZippedLogs();" href="#">download a zip file with all your tab\'s logs</a>.</p><div class="chat-logs-list-content"></div></div>';
-    },
-    getZippedLogs: function() {
-        var zip = new JSZip();
-        $.each(FList.Chat.TabBar.list, function(i,tab){
-            var tabname=tab.id;
-            if(tab.type==="channel") tabname=FList.Chat.channels.getData(tab.id).title;
-            if(tab.type==="user") tabname=FList.Chat.users.getData(tab.id).name;
-            var valid_filename = tabname.replace(/[^a-zA-Z \-_0-9]+/g,'');
-            zip.add(valid_filename+".html", FList.Chat.Logs.getLogDocument(tab));
-        });
-        var content = zip.generate();
-        window.open("data:application/zip;filename=logs.zip;base64,"+content);
-        FList.Common_displayNotice("Download started. Rename the \"download(n)\" file to \"something.zip\", and you will be able to open it for later viewing.");
-    },
-    getLogDocument: function(tab){
-        var tabname=tab.id;
-        if(tab.type==="channel") tabname=FList.Chat.channels.getData(tab.id).title;
-        if(tab.type==="user") tabname=FList.Chat.users.getData(tab.id).name;
-        var doc = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
-        + '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">\n'
-        + '<head><title>F-list - Chat</title>\n'
-        + '<style>\n'
-        + 'h1{color:white;margin-bottom:10px;font-size:14pt;}\n'
-        + 'body{background-color:#1F5284;font-family:verdana,helvetica;font-size:10pt;}\n'
-        + 'body{color:#FFFFFF;font-family:verdana,helvetica;font-size:10pt;}\n' +
-          '</style>\n' +
-          '</head>\n' +
-          '<body>\n' +
-          '<h1>F-Chat Log: ' + tabname + ', ' + new Date() + '</h1>\n' +
-          '<div id="LogContainer">\n';
-        for (var l = 0; l < tab.logs.length; l++) {
-            doc+=tab.logs[l].html;
-        }
-        doc += '</div></body></html>';
-        return doc;
-    }
-};
+    };
+}(FList.Chat));
 
 /**
  * Adds a notification in the browser tab title that you have unread private messages.

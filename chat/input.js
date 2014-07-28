@@ -316,87 +316,86 @@
      *
      * @param {String} msg The user input
      */
-    FList.Chat.Input.handle = function(msg) {
+    FList.Chat.Input.handle = function (msg) {
         curTab = FList.Chat.TabBar.activeTab;
-        var channeldata = FList.Chat.channels.getData(curTab.id),
-            isRp = (/^\/me[\s']/gi).test(msg),
-            msgType = 'chat',
-            isCmd = msg.charAt(0) === '/',
-            isWarn = msg.substring(0, 6) === '/warn ';
 
-        if (isRp) {
-            msgType = 'rp';
-        }
+        var channeldata = FList.Chat.channels.getData(curTab.id),
+            isRp = (msg.indexOf('/me') === 0),
+            msgType = 'chat',
+            isCmd = (msg.charAt(0) === '/'),
+            isWarn = (msg.indexOf('/warn ') === 0);
+
+        if (isRp) msgType = 'rp';
 
         if (curTab.type === 'console') {
+            if (isCmd && !isRp && !isWarn) return this.parse(msg);
 
-                if (isCmd && !isRp && !isWarn) {
-                    return this.parse(msg);
-                }
-
-                FList.Common_displayError('You cannot chat in the console.');
+            return FList.Common_displayError(
+                'You cannot chat in the console.'
+            );
         } else if (curTab.type === 'channel') {
+            if (isCmd && !isRp && !isWarn) return this.parse(msg);
 
-                if (isCmd && !isRp && !isWarn) {
-                    return this.parse(msg);
-                }
+            if (channeldata.mode === 'ads')
+                return FList.Chat.Roleplay.sendAd(curTab.id, msg);
 
-                if (channeldata.mode === 'ads'){
-                    return FList.Chat.Roleplay.sendAd(curTab.id, msg);
-                }
-
-                if (msg.trim()){
-
-                    if (FList.Chat.Settings.current.html5Audio) {
-                        FList.Chat.Sound.playSound('chat');
-                    }
-
-                    wsSend('MSG ' +
-                           JSON.stringify({channel: curTab.id, 'message': msg}));
-
-                    if (isRp) {
-                        msg = msg.substr(3);
-                    }
-
-                    msg = FList.Chat.Input.sanitize(msg);
-
-                    FList.Chat.printMessage({"msg": msg, to: FList.Chat.TabBar.getTabFromId('channel', curTab.id),
-                                            from: FList.Chat.identity, type: msgType});
-
-                    pass();
-                }
-
-        } else {// User
-
-            if (isCmd && !isRp && !isWarn) {
-                return this.parse(msg);
-            }
-
-            if (msg.trim()){
-
-                if (FList.Chat.Settings.current.html5Audio) {
+            if (msg.trim()) {
+                if (FList.Chat.Settings.current.html5Audio)
                     FList.Chat.Sound.playSound('chat');
-                }
 
-                wsSend('PRI ' +
-                       JSON.stringify({recipient: curTab.id, 'message': msg}));
+                wsSend('MSG ' +
+                    JSON.stringify({channel: curTab.id, 'message': msg}));
 
-                if (isRp) {
-                    msg = msg.substr(3);
-                }
+                if (isRp) msg = msg.substr(3);
 
                 msg = FList.Chat.Input.sanitize(msg);
 
-                FList.Chat.printMessage({"msg": msg, from: FList.Chat.identity, type: msgType});
+                FList.Chat.printMessage({
+                    "msg": msg,
+                    to: FList.Chat.TabBar.getTabFromId('channel', curTab.id),
+                    from: FList.Chat.identity,
+                    type: msgType
+                });
+
+                pass();
+            }
+        } else {// User
+            if (isCmd && !isRp && !isWarn) return this.parse(msg);
+
+            if (msg.trim()) {
+
+                if (FList.Chat.Settings.current.html5Audio)
+                    FList.Chat.Sound.playSound('chat');
+
+                wsSend('PRI ' +
+                    JSON.stringify({recipient: curTab.id, 'message': msg}));
+
+                if (isRp) msg = msg.substr(3);
+
+                msg = FList.Chat.Input.sanitize(msg);
+
+                FList.Chat.Logs.saveLogs(
+                    FList.Chat.identity,
+                    {
+                        msg: msg,
+                        kind: msgType,
+                        to: curTab.id.toLowerCase()
+                    }
+                );
+
+                FList.Chat.printMessage({
+                    msg: msg,
+                    from: FList.Chat.identity,
+                    type: msgType
+                });
 
                 pass();
 
                 curTab.metyping = false;
+
                 curTab.mewaiting = true;
             }
-
         }
-
     };
 
     /**
