@@ -113,8 +113,8 @@ FList.Chat = {
                     }
                 });
             });
-            $(".channels-tab-label span.sort:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "users", _order==="default" ? "reverse" : "default"); });
-            $(".channels-tab-label span.label:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "label", _order==="default" ? "reverse" : "default"); });
+            $(".channels-tab-label span.sort:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "users", _order==="default" ? "reverse"  : "default"); });
+            $(".channels-tab-label span.label:first").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("public", "label", _order==="default" ? "reverse"  : "default"); });
         }
         if(_type==="private"){
             $(".chatui-tab-channels .private").html("");
@@ -152,8 +152,6 @@ FList.Chat = {
             $(".channels-tab-label span.sort:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "users", _order==="default" ? "reverse"  : "default"); });
             $(".channels-tab-label span.label:last").unbind("click").click(function(){ FList.Chat.rebuildChannelsTab("private", "label", _order==="default" ? "reverse"  : "default"); });
         }
-
-
     },
 
     openPrivateChat: function (name, dounescape) {
@@ -222,7 +220,7 @@ FList.Chat.Settings = {
         else FList.Chat.Settings.current=JSON.parse(settingsString);
     },
     getPanel: function(){
-        return "<div class='StyledForm'><div class='group'><div class='settings-tab-label'><span>Layout & Display</span></div><p><span class='label'>Display limit</span><span class='element'><input type='text' maxlength='5' size='5' class='ui-settings-visiblelines'/></span></p><p><span class='label'>Tabs on the side</span><span class='element'><input type='checkbox' class='ui-settings-tabsontheside'/></span></p><p><span class='label'>Disable userlist</span><span class='element'><input type='checkbox' class='ui-settings-disableuserlist'/></span></p><p><span class='label'>Keep focus on typing area.</span><span class='element'><input type='checkbox' class='ui-settings-keeptypingfocus'/></span></p><p><span class='label'>Font size</span><span class='element'><input type='text' maxlength='3' size='3' class='ui-settings-fontsize'/></span></p><p><span class='label'>Highlight messages</span><span class='element'><input type='checkbox' class='ui-settings-highlightmentions'/></span></p><p><span class='label'>Highlight Words</span><span class='element'><input type='text' maxlength='255' size='12' class='ui-settings-highlightwords'/></span></p><p><span class='label'>Auto-parse URLs</span><span class='element'><input type='checkbox' class='ui-settings-autoparseurls'/></span></p></div><div class='group'><div class='settings-tab-label'><span>Functionality</span></div><p><span class='label'>HTML5 Audio</span><span class='element'><input type='checkbox' class='ui-settings-html5audio'/></span></p><p><span class='label'>Join/Leave messages</span><span class='element'><input type='checkbox' class='ui-settings-joinleavealerts'/></span></p><p><span class='label'>Disable [icon] tag</span><span class='element'><input type='checkbox' class='ui-settings-disableicontag'/></span></p><p><span class='label'>HTML5 Notifications</span><span class='element'><input type='checkbox' class='ui-settings-html5notifications'/></span></p><p><span class='label'>Auto Idle</span><span class='element'><input type='checkbox' class='ui-settings-autoidle'/></span></p><p><span class='label'>Idle time(ms)</span><span class='element'><input type='text' maxlength='7' size='6' class='ui-settings-autoidletime'/></span></p><p><span class='label'>Enable Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablelogging'/><p><span class='label'>Enable PM Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablepmlogging'/></span></p><p><span class='label'>Clear PM Logs</span><span class='element'><input type='button' onclick='FList.Chat.Logs.clearLogs()' class='ui-settings-clearStorage ui-button ui-widget ui-state-default ui-corner-all' value='clear' style='position:relative;height:100%;width:100%;padding:0px;'/></span></p><p><span class='label'>Friend notifications</span><span class='element'><input type='checkbox' class='ui-settings-friendnotifications'/></span></p><p><span class='label'>Alerts for bug reports</span><span class='element'><input type='checkbox' class='ui-settings-alertsforbugreports'/></span></p><p><span class='label'>Alerts for helpdesk tickets</span><span class='element'><input type='checkbox' class='ui-settings-alertsfortickets'/></span></p><p><span class='label'>Alerts for group requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforgrouprequests'/></span></p><p><span class='label'>Alerts for feature requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforfeatures'/></span></p><p><span class='label'>Left click opens f-list profile</span><span class='element'><input type='checkbox' class='ui-settings-leftclickopensflist'/></span></p><p><span class='label'>Animated Tab Activity</span><span class='element'><input type='checkbox' class='ui-settings-flashTabIndicate'/></span></p></div><div class='group'><p><input type='button' id='settings-panel-save' value='Save' onclick='FList.Chat.Settings.savePanel();'/><input type='button' id='settings-panel-reset' value='Reset' onclick='FList.Chat.Settings.resetPanel();'/></p></div></div>";
+        return "<div class='StyledForm'><div class='group'><div class='settings-tab-label'><span>Layout & Display</span></div><p><span class='label'>Display limit</span><span class='element'><input type='text' maxlength='5' size='5' class='ui-settings-visiblelines'/></span></p><p><span class='label'>Tabs on the side</span><span class='element'><input type='checkbox' class='ui-settings-tabsontheside'/></span></p><p><span class='label'>Disable userlist</span><span class='element'><input type='checkbox' class='ui-settings-disableuserlist'/></span></p><p><span class='label'>Keep focus on typing area.</span><span class='element'><input type='checkbox' class='ui-settings-keeptypingfocus'/></span></p><p><span class='label'>Font size</span><span class='element'><input type='text' maxlength='3' size='3' class='ui-settings-fontsize'/></span></p><p><span class='label'>Highlight messages</span><span class='element'><input type='checkbox' class='ui-settings-highlightmentions'/></span></p><p><span class='label'>Highlight Words</span><span class='element'><input type='text' maxlength='255' size='12' class='ui-settings-highlightwords'/></span></p><p><span class='label'>Auto-parse URLs</span><span class='element'><input type='checkbox' class='ui-settings-autoparseurls'/></span></p></div><div class='group'><div class='settings-tab-label'><span>Functionality</span></div><p><span class='label'>HTML5 Audio</span><span class='element'><input type='checkbox' class='ui-settings-html5audio'/></span></p><p><span class='label'>Join/Leave messages</span><span class='element'><input type='checkbox' class='ui-settings-joinleavealerts'/></span></p><p><span class='label'>Disable [icon] tag</span><span class='element'><input type='checkbox' class='ui-settings-disableicontag'/></span></p><p><span class='label'>HTML5 Notifications</span><span class='element'><input type='checkbox' class='ui-settings-html5notifications'/></span></p><p><span class='label'>Auto Idle</span><span class='element'><input type='checkbox' class='ui-settings-autoidle'/></span></p><p><span class='label'>Idle time(ms)</span><span class='element'><input type='text' maxlength='7' size='6' class='ui-settings-autoidletime'/></span></p><p><span class='label'>Enable Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablelogging'/><p><span class='label'>Enable PM Logging</span><span class='element'><input type='checkbox' class='ui-settings-enablepmlogging'/></span></p><p><span class='label'>Clear PM Logs</span><span class='element'><input type='button' onclick='FList.Chat.Logs.Delete()' class='ui-settings-clearStorage ui-button ui-widget ui-state-default ui-corner-all' value='clear' style='position:relative;height:100%;width:100%;padding:0px;'/></span></p><p><span class='label'>Friend notifications</span><span class='element'><input type='checkbox' class='ui-settings-friendnotifications'/></span></p><p><span class='label'>Alerts for bug reports</span><span class='element'><input type='checkbox' class='ui-settings-alertsforbugreports'/></span></p><p><span class='label'>Alerts for helpdesk tickets</span><span class='element'><input type='checkbox' class='ui-settings-alertsfortickets'/></span></p><p><span class='label'>Alerts for group requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforgrouprequests'/></span></p><p><span class='label'>Alerts for feature requests</span><span class='element'><input type='checkbox' class='ui-settings-alertsforfeatures'/></span></p><p><span class='label'>Left click opens f-list profile</span><span class='element'><input type='checkbox' class='ui-settings-leftclickopensflist'/></span></p><p><span class='label'>Animated Tab Activity</span><span class='element'><input type='checkbox' class='ui-settings-flashTabIndicate'/></span></p></div><div class='group'><p><input type='button' id='settings-panel-save' value='Save' onclick='FList.Chat.Settings.savePanel();'/><input type='button' id='settings-panel-reset' value='Reset' onclick='FList.Chat.Settings.resetPanel();'/></p></div></div>";
     },
     initPanel: function(){
         $(".ui-settings-fontsize").val(FList.Chat.Settings.current.fontSize);
@@ -271,7 +269,7 @@ FList.Chat.Settings = {
         var alertsForGrouprequests=$(".ui-settings-alertsforgrouprequests:checked").length>0 ? true : false;
         var keepTypingFocus=$(".ui-settings-keeptypingfocus:checked").length>0 ? true : false;
         var tabsOnTheSide=$(".ui-settings-tabsontheside:checked").length>0 ? true : false;
-        var highlightWords=$(".ui-settings-highlightwords").val().split(",");
+        var highlightWords=$(".ui-settings-highlightwords").val().split(",  ");
         var flashTabIndicate=$(".ui-settings-flashTabIndicate:checked").length>0 ? true : false;
         if(highlightWords[0]==="") highlightWords=[];
         FList.Chat.Settings.current.fontSize=fontSize;
@@ -364,7 +362,7 @@ FList.Chat.Settings = {
 
 FList.Chat.Status = {
     getPanel: function(){
-        return "<div style='padding:10px;border-bottom:1px solid rgba(0,0,0,0.4);' class='panel'><img src='" + staticdomain + "images/noavatar.png' style='margin-right:10px;vertical-align:top;' id='status-avatar'/><span id='status-name' style='font-size:2em;margin-top:0px;vertical-align:top;'>Loading...</span></div><div style='padding:10px;'><p><span class='chat-field-label'>Status:</span><select class='ui-statusdlg-status select'><option value='online'>Online</option><option value='looking'>Looking</option><option value='busy'>Busy</option><option value='away'>Away</option><option value='dnd'>DND</option></select></p><p><span class='chat-field-label'>Message: </span><input type='text' maxlength='256' class='ui-statusdlg-message'/></p><p><input type='button' id='status-panel-update' class='button' onclick='FList.Chat.Status.confirmStatus();' value='Update'/></p></div>";
+        return "<div style='padding:10px;border-bottom:1px solid rgba(0,0,0,0.4);' class='panel'><img src='" + staticdomain + "images/noavatar.png' style='margin-right:10px;vertical-align:top;' id='status-avatar'/><span id='status-name' style='font-size:2em;margin-top:0px;vertical-align:top;'>Loading...</span></div><div style='padding:10px;'><p><span class='chat-field-label'>Status:</span><select class='ui-statusdlg-status select'><option value='online'>Online</option><option value='looking'>Looking</option><option value='busy'>Busy</option><option value='away'>Away</option><option value='dnd'>DND</option></select></p><p><span class='chat-field-label'>Message: </span><input type='text'  maxlength='256' class='ui-statusdlg-message'/></p><p><input type='button' id='status-panel-update' class='button' onclick='FList.Chat.Status.confirmStatus();' value='Update'/></p></div>";
     },
     confirmStatus: function(){
         var newstatus=$(".ui-statusdlg-status option:selected").text();
@@ -372,10 +370,6 @@ FList.Chat.Status = {
         FList.Chat.IdleTimer.idle=false;
         FList.Chat.IdleTimer.reset();
         FList.Connection.send("STA " + JSON.stringify({ status: newstatus, statusmsg: newmessage }));
-
-        FList.Chat.Status.response.msg = undefined;
-        FList.Chat.Status.response.alertedUsers = {};
-
         $("#chatui-tabs").tabs( "select" , 1 );
     },
     lastStatus: { status: "Online", statusMessage: "" },
@@ -398,10 +392,6 @@ FList.Chat.Status = {
         FList.Chat.printMessage({msg: 'Your status was set to ' + (((status === 'Crown') ? 'Cookie': status) +
                                 ((message.length > 0) ? ', "' + FList.Chat.Input.sanitize(message) + '"' : '')),
                                 from: 'System', type: 'system'});
-
-        FList.Chat.Status.response.msg = undefined;
-        FList.Chat.Status.response.alertedUsers = {};
-
         if(status!=="Idle"){
             this.lastStatus.status=status.toLowerCase();
         }
@@ -411,15 +401,6 @@ FList.Chat.Status = {
 
     restore: function(){
        FList.Connection.send("STA " + JSON.stringify({ status: this.lastStatus.status, statusmsg: this.lastStatus.statusMessage }));
-
-        FList.Chat.Status.response.msg = undefined;
-        FList.Chat.Status.response.alertedUsers = {};
-    },
-
-    response: {
-        alertedUsers: {},
-        msg: undefined,
-        default: FList.Chat.Settings.current.defaultResponse
     }
 
 };
@@ -901,7 +882,9 @@ FList.Chat.TabBar = new function TabBar() {
             saveData = JSON.parse(saveString);
 
         if (typeof Storage !== "undefined" && saveString === undefined) {
-            localStorage["tabs_" + userString] = FList.Common_getCookie("tabs_" + userString);
+            localStorage["tabs_" + userString] = FList.Common_getCookie(
+                "tabs_" + userString
+            );
             saveString = localStorage["tabs_" + userString];
             saveData = JSON.parse(saveString);
         }
@@ -915,7 +898,9 @@ FList.Chat.TabBar = new function TabBar() {
                 function(i, curTab) {
                     var chan,
                         local = FList.Chat.TabBar,
-                        tabObj = local.getTabFromId(curTab.type, curTab.id).tab,
+                        tabObj = local.getTabFromId(
+                            curTab.type, curTab.id
+                        ).tab,
                         isPinned = local.getTabFromElement(tabObj).pinned;
 
                     if (curTab.type === "channel") {
@@ -943,8 +928,6 @@ FList.Chat.TabBar = new function TabBar() {
 
             FList.Chat.restoreTabs = [];
         }
-
-        return;
     };
 
     this.saveTabs = function(){
@@ -1251,7 +1234,7 @@ FList.Chat.Roleplay = {
             $(".send-input-ad").addClass("Busy").css({"background-repeat":"no-repeat","background-position":"left center"});
             FList.Chat.Roleplay.timer=setTimeout(function(){ FList.Chat.Roleplay.timerClock(channel); }, this.canPost(channel)+1000);
         } else {
-            $(".send-input-ad").button("enable").removeClass("Busy").removeAttr("style");
+            $(".send-input-ad").button("enable").removeClass("Busy");
         }
     }
 
@@ -1519,25 +1502,18 @@ FList.Chat.Sound = {
 
 FList.Chat.Notifications = {
     init: function(){
-        if (window.webkitNotifications) {
+        if(window.webkitNotifications){
             window.webkitNotifications.requestPermission();
-        } else if (window.chrome.notifications) {
-            chrome.notifications.onClicked.addListener(function (){
-                    tabInstance();
-                    window.focus();
-                });
         } else if (window.Notification) {
             Notification.requestPermission(function (status) {
-                    if (Notification.permission !== status) {
-                        Notification.permission = status;
-                    }
-                });
+                if (Notification.permission !== status) {
+                    Notification.permission = status;
+                }
+            });
         }
     },
-    message: function(title, message, image, tabInstance) {
-        var valid;
-
-        if (window.webkitNotifications) {
+    message: function(title, message, image, tabInstance){
+        if(window.webkitNotifications){
             if(window.webkitNotifications.checkPermission() === 0){
                 var instance=window.webkitNotifications.createNotification(image,title, message.substr(0,100));
                 instance.onclick = function() {
@@ -1551,28 +1527,6 @@ FList.Chat.Notifications = {
 
                 instance.show();
             }
-        } else if (window.chrome.notifications) {
-            valid = chrome.notifications.getPermissionLevel(function(status) {
-                    return status === 'granted';
-                });
-
-            if (valid) {
-                valid = chrome.notifications.create(
-                        'F-Chat 2.0',
-                        {
-                            type: 'basic',
-                            title: title,
-                            message: message.substr(0,97) + '...',
-                            iconUrl: image
-                        },
-                        function (notificationId) {
-                            return notificationId;
-                    });
-
-                setTimeout(function(){
-                        chrome.notifications.clear(valid, function(){});
-                    }, 10000);
-            }
         } else if (window.Notification) {
             if (Notification.permission === "granted") {
                 (function() {
@@ -1585,7 +1539,6 @@ FList.Chat.Notifications = {
                     );
                     instance.onclick = function() {
                         tabInstance();
-                        window.focus();
                     };
                     setTimeout(instance.close(), 10000);
                 }());
@@ -1627,8 +1580,8 @@ FList.Chat.IdleTimer = {
         FList.Chat.IdleTimer.disable();
         if(FList.Chat.Settings.current.autoIdle) FList.Chat.IdleTimer.enable();
     },
-    enable: function(){
-        if(FList.Chat.Settings.current.autoIdle) {
+    enable: function () {
+        if (FList.Chat.Settings.current.autoIdle) {
             FList.Chat.IdleTimer.timer = setTimeout(function () {
                 FList.Chat.IdleTimer.timer=0;
                 var tempstate={};
@@ -1636,9 +1589,6 @@ FList.Chat.IdleTimer = {
                 tempstate.statusmsg=FList.Chat.Status.lastStatus.statusMessage;
                 FList.Connection.send("STA " + JSON.stringify(tempstate));
                 FList.Chat.IdleTimer.idle=true;
-
-                FList.Chat.Status.response.msg = undefined;
-                FList.Chat.Status.response.alertedUsers = {};
             }, FList.Chat.Settings.current.autoIdleTime);
         }
     },
@@ -1742,7 +1692,7 @@ FList.Chat.staffAlert = {
     },
 
     dialog: function(){
-        var alertdialog = $("<div class='StyledForm'><p><span class='label'>Include active tab's logs</span><span class='element'><input type='checkbox' checked='true' class='ui-report-logs'/></span></p><p><span class='label'>Reporting user</span><span class='element'><input type='text' class='ui-report-user'/></span></p><p><span class='label'>Details</span><span class='element'><textarea class='ui-report-text'></textarea></span></p></div>");
+        var alertdialog = $("<div class='StyledForm'><p>This report will include the active tab's logs. Please ensure you're looking at the tab you mean to report.</p><p><span class='label'>Reporting user</span><span class='element'><input type='text' class='ui-report-user'/></span></p><p><span class='label'>Details</span><span class='element'><textarea class='ui-report-text'></textarea></span></p></div>");
         alertdialog.dialog({
             autoOpen: true, title: 'Send Staff Alert', width: '350', height:'420', modal: true,
             buttons: {
@@ -2130,8 +2080,8 @@ var wfocus; /**@define {Boolean} wfocus Global window focus variable*/
  * Title draw function.
  */
 FList.tNotice.draw = function() {
-    document.title = '(' + this.tabTally.sum + ') F-list - Chat (' +
-                     FList.Chat.identity + ')';
+    document.title = '(' + this.tabTally.sum +
+        ') F-list - Chat (' + FList.Chat.identity + ')';
 };
 
 /**

@@ -31,48 +31,30 @@ FList.Chat.parseCommand = function (line)
 };
 FList.Chat.commands['STA'] = function (params)
 { //STA username status
-    var user = params.character,
-        sta = FList.Chat.users.sanitizeStatus(params.status),
-        data = FList.Chat.users.getData(user),
-        alert=true,
-        printtab,
-        active,
-        message;
-
-    alert = (data.status=="idle" || sta=="Idle")? false : true;
-
+    var user = params.character;
+    var sta = FList.Chat.users.sanitizeStatus(params.status);
+    var data = FList.Chat.users.getData(user);
+    var alert=true;
+    if(data.status=="idle" || sta=="Idle") alert=false;
     params.statusmsg = params.statusmsg.replace(/\[icon\].*\[\/icon\]/g, "");
-
     data.status = sta;
-
     data.statusmsg = params.statusmsg;
-
     FList.Chat.users.setData(user, data);
-
-    if(params.character==FList.Chat.identity) {
+    if(params.character==FList.Chat.identity){
         FList.Chat.Status.set(sta, params.statusmsg);
     }
-
-    printtab = FList.Chat.TabBar.getTabFromId("user", params.character);
-
-    active = params.character.toLowerCase() === FList.Chat.TabBar.activeTab.id &&
-             FList.Chat.TabBar.activeTab.type === "user";
-
-    message = "[user]" + params.character + "[/user] changed status to " +
-              sta + ((params.statusmsg !== "") ? ", " + params.statusmsg : "");
-
+    var printtab=FList.Chat.TabBar.getTabFromId("user", params.character);
+    var active=params.character.toLowerCase()==FList.Chat.TabBar.activeTab.id && FList.Chat.TabBar.activeTab.type=="user";
+    var message="[user]" + params.character + "[/user] changed status to " + sta + (params.statusmsg!=="" ? ", " + params.statusmsg : "");
     if (!printtab) {//there is no tab open with this guy.
         if(FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications && alert){//but we want notifications.
             FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});//print stuff in the active tab.
         }
     }  else {//there is a tab open.
-
-        if(active) {//are we looking at it?
-
-            if(alert) {//FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications &&
+        if(active){//are we looking at it?
+            if(alert){//FList.Chat.users.isTracked(params.character) && FList.Chat.Settings.current.friendNotifications &&
                 FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});//print stuff in the active tab.
             }
-
             FList.Chat.InfoBar.update();
         } else {
 
@@ -87,15 +69,12 @@ FList.Chat.commands['STA'] = function (params)
             }
 
         }
-
         FList.Chat.TabBar.updateTooltip(printtab);
     }
-
-    if(FList.Chat.TabBar.activeTab.type === "channel") {
+    if(FList.Chat.TabBar.activeTab.type=="channel"){
         FList.Chat.UserBar.updateUser(params.character);
     }
 };
-
 FList.Chat.commands['LIS'] = function (params)
 {
     var users = params.characters;
@@ -146,20 +125,14 @@ FList.Chat.commands['FLN'] = function (params)
         FList.Chat.TabBar.updateTooltip(printtab);
     }
 };
-
-FList.Chat.commands.CDS = function(data) {
-    var local = FList.Chat,
-        tabData = local.channels.getData(data.channel);
-
-    tabData.description = data.description;
-
-    if (local.TabBar.activeTab.id === data.channel) {
-        local.InfoBar.update();
+FList.Chat.commands['CDS'] = function (params)
+{
+    FList.Chat.channels.getData(params.channel).description = params.description;
+    if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
+        FList.Chat.InfoBar.update();
     }
-
-    local.TabBar.updateTooltip(local.TabBar.getTabFromId("channel", data.channel));
+    FList.Chat.TabBar.updateTooltip(FList.Chat.TabBar.getTabFromId("channel", params.channel));
 };
-
 FList.Chat.commands['CIU'] = function(params) {
     var message = params.sender + " has invited you to join [session=" + params.title + "]" + params.name + "[/session].";
     FList.Chat.printMessage({msg: message, from: 'System', type: 'system'});
@@ -239,7 +212,6 @@ FList.Chat.commands.FKS = function(data) {
 
     $("#search-panel-go").val("Search").attr("disabled", false);
 };
-
 
 FList.Chat.commands['CHA'] = function (params)
 {
@@ -439,6 +411,7 @@ FList.Chat.commands['IDN'] = function (params)
     FList.Chat.IdleTimer.init();
     $("#message-field").focus();
     FList.Chat.UI.setDone();
+    document.title = "F-list - Chat (" + FList.Chat.identity + ")";
 };
 FList.Chat.commands['UPT'] = function(params) {
     var message = "Server has been running since " + params.startstring + ", there are " + params.channels.toString() + " channels, " + params.users + " users, " + params.accepted + " accepted connections, " + params.maxusers + " users was the maximum number of users connected at some point since the last server restart.";

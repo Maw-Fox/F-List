@@ -4,7 +4,7 @@ FList.Connection = {
     host: "wss://chat.f-list.net:9799/",//chat.f-list.net
     pingTimeout: 0,
     getTicket: function(callback){
-		var faccount=$("#chat-account").val();
+        var faccount=$("#chat-account").val();
         $.ajax({
             type: "GET",
             url: domain + "json/getApiTicket.php",
@@ -107,7 +107,7 @@ FList.Connection = {
                 FList.Common_displayError("Please <a href='http://get.adobe.com/flashplayer'>Install Flash Player 10+</a>, or Disable Ad blocker to use F-Chat.");
                 return;
             }
-		}
+        }
         FList.Chat.UI.setBusy("Connecting...", 10000);
         FList.Connection.getTicket(function(account, ticket, friends, bookmarks){
             $.each(friends, function(i, friend){
