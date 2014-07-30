@@ -153,9 +153,7 @@
             matcherString,
             regx;
 
-        input = input
-                .replace(/ +/gi, ' ')
-                .split(' ');
+        input = input.split(/ +/gi);
 
         invoke = input
                  .shift()
