@@ -99,7 +99,6 @@ FList.Chat.commands.FLN = function (params) {
         for (key in local.channels.list) {
             chan = local.channels.list[key];
             if (chan.userlist.indexOf(params.character) !== -1) {
-                console.log(FList.Chat.TabBar.getTabFromId('channel', chan.name));
                 local.printMessage({
                     from: 'System',
                     to: FList.Chat.TabBar.getTabFromId('channel', chan.name),
