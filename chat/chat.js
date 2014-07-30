@@ -1732,33 +1732,6 @@ FList.Chat.staffAlert = {
 };
 
 /**
- * Offline Log Cleaner
- */
-(function (local) {
-    var WEEK = 604800000,
-        curObj,
-        LS_KEYS = Object.keys(localStorage);
-
-    if (window.Storage) {
-        $.each(localStorage, function (cur) {
-            cur = LS_KEYS[cur];
-
-            if (cur.indexOf(local.identity) === 0) {
-                if (localStorage[cur].charAt(0) !== '{') {
-                    delete localStorage[cur];
-                } else {
-                    curObj = JSON.parse(localStorage[cur]);
-
-                    if (new Date().getTime() - curObj.last > WEEK) {
-                        delete localStorage[cur];
-                    }
-                }
-            }
-        });
-    }
-}(FList.Chat));
-
-/**
  * Offline logging/Log-getters
  */
 FList.Chat.Logs = (function (local) {

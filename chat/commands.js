@@ -412,6 +412,33 @@ FList.Chat.commands['IDN'] = function (params)
     $("#message-field").focus();
     FList.Chat.UI.setDone();
     document.title = "F-list - Chat (" + FList.Chat.identity + ")";
+
+    /**
+     * Offline Log Cleaner
+     */
+    (function (local) {
+        var WEEK = 604800000,
+            curObj,
+            LS_KEYS = Object.keys(localStorage);
+
+        if (window.Storage) {
+            $.each(localStorage, function (cur) {
+                cur = LS_KEYS[cur];
+
+                if (cur.indexOf(local.identity) === 0) {
+                    if (localStorage[cur].charAt(0) !== '{') {
+                        delete localStorage[cur];
+                    } else {
+                        curObj = JSON.parse(localStorage[cur]);
+
+                        if (new Date().getTime() - curObj.last > WEEK) {
+                            delete localStorage[cur];
+                        }
+                    }
+                }
+            });
+        }
+    }(FList.Chat));
 };
 FList.Chat.commands['UPT'] = function(params) {
     var message = "Server has been running since " + params.startstring + ", there are " + params.channels.toString() + " channels, " + params.users + " users, " + params.accepted + " accepted connections, " + params.maxusers + " users was the maximum number of users connected at some point since the last server restart.";
