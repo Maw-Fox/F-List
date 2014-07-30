@@ -151,11 +151,15 @@ FList.Chat.printMessage({msg: params.message + '\n\nClick the \'channels\' butto
                         ' channel.\n\nRemember to follow the [url=https://wiki.f-list.net/index.php/Rules]site rules[/url]!',
                         from: 'System', type: 'system'});
 };
-FList.Chat.commands['COL'] = function (params)
-{
-FList.Chat.channels.getData(params.channel).oplist=params.oplist;
-FList.Chat.channels.getData(params.channel).owner=params.oplist[0];
+
+FList.Chat.commands.COL = function (params) {
+    FList.Chat.channels.getData(params.channel).oplist=params.oplist.map(function (op) {
+        return op.toLowerCase();
+    });
+
+    FList.Chat.channels.getData(params.channel).owner=params.oplist[0];
 };
+
 FList.Chat.commands['ORS'] = function (params)
 {
     var channels = params.channels;
@@ -251,20 +255,23 @@ FList.Chat.commands['CON'] = function(params) {
         FList.Chat.UserBar.renderTheWholeFuckingThing(false);
     },5000);
 };
-FList.Chat.commands['ADL'] = function (params)
-{
-    FList.Chat.opList=params.ops;
+
+FList.Chat.commands.ADL = function (params) {
+    FList.Chat.opList=params.ops.map(function (op) {
+        return op.toLowerCase();
+    });
 };
+
 FList.Chat.commands['AOP'] = function (params)
 {
-    FList.Chat.opList.push(params.character);
+    FList.Chat.opList.push(params.character.toLowerCase());
     if(FList.Chat.TabBar.activeTab.type=="user" && FList.Chat.TabBar.activeTab.id==params.character.toLowerCase()){
         FList.Chat.InfoBar.update();
     }
 };
 FList.Chat.commands['DOP'] = function (params)
 {
-    FList.Chat.opList = jQuery.grep(FList.Chat.opList, function(value) { return value != params.character;});
+    FList.Chat.opList = jQuery.grep(FList.Chat.opList, function(value) { return value != params.character.toLowerCase();});
     if(FList.Chat.TabBar.activeTab.type=="user" && FList.Chat.TabBar.activeTab.id==params.character.toLowerCase()){
         FList.Chat.InfoBar.update();
     }
