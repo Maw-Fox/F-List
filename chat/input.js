@@ -154,7 +154,7 @@
             regx;
 
         input = input
-                .replace(/[\s]+/gi, ' ')
+                .replace(/ +/gi, ' ')
                 .split(' ');
 
         invoke = input
