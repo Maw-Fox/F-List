@@ -558,8 +558,9 @@ FList.Chat.UserBar = new function UserBar() {
     this.hide = function(){ $("#user-bar").hide();};
     this.show = function(){ $("#user-bar").show();$( "#user-bar" ).resizable("destroy");$( "#user-bar" ).resizable({ handles: "w", maxWidth: 400, minWidth: 50, resize: function(){ $( "#user-bar" ).css("left", "0px");FList.Chat.UI.resize();$(".user-view-tab").css("width", (($("#user-bar").outerWidth()/2)-11) + 'px'); } });};
 
-    this.removeUser = function(name){
-        name=name.toLowerCase();
+    this.removeUser = function(name) {
+        name = name.toLowerCase();
+
         if($("#user-bar span[rel='" + name + "']").length>0){
             $("#user-bar span[rel='" + name + "']").remove();
             var usrs=parseInt($("#user-view-avatars").html())-1;

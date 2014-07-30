@@ -89,15 +89,35 @@ FList.Chat.commands['LIS'] = function (params)
         FList.Chat.users.setData(users[i][0], data);
     }
 };
-FList.Chat.commands['FLN'] = function (params)
-{
+
+FList.Chat.commands.FLN = function (params) {
+    var local = FList.Chat,
+        key,
+        chan;
+
+    if (local.Settings.current.joinLeaveAlerts) {
+        for (key in local.channels.list) {
+            chan = local.channels.list[key];
+            if (chan.userlist.indexOf(params.character) !== -1) {
+                console.log(FList.Chat.TabBar.getTabFromId('channel', chan.name));
+                local.printMessage({
+                    from: 'System',
+                    to: FList.Chat.TabBar.getTabFromId('channel', chan.name),
+                    msg: '<a class="AvatarLink">' + params.character +
+                        '</a> left ' + chan.title +
+                        '. <i>[Reason: Disconnect]</i>',
+                    type: 'system'
+                });
+            }
+        }
+    }
 
     FList.Chat.users.remove(params.character);
     FList.Chat.users.count-=1;
     if(FList.Chat.TabBar.activeTab.type=="console"){
         $("#info-bar-actions").html(FList.Chat.users.count + " users connected.");
     }
-    if(FList.Chat.TabBar.activeTab.type=="channel"){
+    if(FList.Chat.TabBar.activeTab.type === "channel"){
         FList.Chat.UserBar.removeUser(params.character);
     }
     var printtab=FList.Chat.TabBar.getTabFromId("user", params.character);
@@ -125,6 +145,7 @@ FList.Chat.commands['FLN'] = function (params)
         FList.Chat.TabBar.updateTooltip(printtab);
     }
 };
+
 FList.Chat.commands['CDS'] = function (params)
 {
     FList.Chat.channels.getData(params.channel).description = params.description;
@@ -319,7 +340,8 @@ FList.Chat.commands['ICH'] = function (params)
         data.userMode = params.mode;
     }
 };
-FList.Chat.commands['LCH'] = function (params)
+
+FList.Chat.commands.LCH = function (params)
 {
     FList.Chat.channels.removeUser(params.channel, params.character);
 
@@ -333,7 +355,8 @@ FList.Chat.commands['LCH'] = function (params)
         if(FList.Chat.Settings.current.joinLeaveAlerts){
             var title=FList.Chat.channels.getData(params.channel).title;
             FList.Chat.printMessage({msg: '<a class="AvatarLink">' + params.character + '</a> left ' +
-                                    title + '.', to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
+                                    title + '. <i>[Reason: Left]</i>',
+                                    to: FList.Chat.TabBar.getTabFromId('channel', params.channel),
                                     from: 'System', type: 'system'});
         }
         if(FList.Chat.TabBar.activeTab.type=="channel" && FList.Chat.TabBar.activeTab.id==params.channel){
@@ -341,6 +364,7 @@ FList.Chat.commands['LCH'] = function (params)
         }
     }
 };
+
 FList.Chat.commands['JCH'] = function (params)
 {
     if (params.character.identity == FList.Chat.identity)
