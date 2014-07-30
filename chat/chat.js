@@ -542,13 +542,13 @@ FList.Chat.getPrintClasses = function(name, channel){
     if (jQuery.inArray(name.toLowerCase(), FList.Chat.ignoreList) !== -1) classstring+=" AvatarBlocked";
     if(jQuery.inArray(name, FList.Chat.friendsList)!==-1) classstring+=" AvatarFriend";
     if(channel===false){
-        if(jQuery.inArray(name,FList.Chat.opList)!==-1) classstring+=" OpLink";
+        if(jQuery.inArray(name.toLowerCase(),FList.Chat.opList)!==-1) classstring+=" OpLink";
         //todo: friend, block.
     } else {
         var channeldata=FList.Chat.channels.getData(channel);
         if(channeldata.owner===name) classstring+=" ChanOwnerLink";
-        if(jQuery.inArray(name,FList.Chat.opList)!==-1 && channeldata.owner!==name) classstring+=" OpLink";
-        if(jQuery.inArray(name,channeldata.oplist)!==-1 && jQuery.inArray(name,FList.Chat.opList)===-1 && channeldata.owner!==name) classstring+=" ChanOpLink";
+        if(jQuery.inArray(name.toLowerCase(),FList.Chat.opList)!==-1 && channeldata.owner!==name) classstring+=" OpLink";
+        if(jQuery.inArray(name.toLowerCase(),channeldata.oplist)!==-1 && jQuery.inArray(name.toLowerCase(),FList.Chat.opList)===-1 && channeldata.owner!==name) classstring+=" ChanOpLink";
         //todo: friend, block.
     }
     return classstring;
@@ -586,7 +586,7 @@ FList.Chat.UserBar = new function UserBar() {
         var isFriend=(jQuery.inArray(user, FList.Chat.friendsOnline)!==-1) || (jQuery.inArray(user, FList.Chat.bookmarksOnline)!==-1);
         var target=$("#user-bar .section-default");
         var linkclasses=FList.Chat.getPrintClasses(user, FList.Chat.TabBar.activeTab.id);
-        if(user===channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
+        if(user===channeldata.owner || jQuery.inArray(user.toLowerCase(),channeldata.oplist)!==-1 || jQuery.inArray(user.toLowerCase(),FList.Chat.opList)!==-1){
             html="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'><span class='rank'></span>" + user + "</span>";
             target=$("#user-bar .section-ops");
         } else if(isFriend){
@@ -635,7 +635,7 @@ FList.Chat.UserBar = new function UserBar() {
             $.each(users, function(i, user){
                 var isFriend=(jQuery.inArray(user, FList.Chat.friendsOnline)!==-1) || (jQuery.inArray(user, FList.Chat.bookmarksOnline)!==-1);
                 var linkclasses=FList.Chat.getPrintClasses(user, FList.Chat.TabBar.activeTab.id);
-                if(user===channeldata.owner || jQuery.inArray(user,channeldata.oplist)!==-1 || jQuery.inArray(user,FList.Chat.opList)!==-1){
+                if(user===channeldata.owner || jQuery.inArray(user.toLowerCase(),channeldata.oplist)!==-1 || jQuery.inArray(user.toLowerCase(),FList.Chat.opList)!==-1){
                     ophtml+="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'><span class='rank'></span>" + user + "</span>";
                 } else if(isFriend){
                         friendhtml+="<span class='" + linkclasses + "' rel='" + user.toLowerCase() + "'>" + user + "</span>";
