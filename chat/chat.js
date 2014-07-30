@@ -269,7 +269,7 @@ FList.Chat.Settings = {
         var alertsForGrouprequests=$(".ui-settings-alertsforgrouprequests:checked").length>0 ? true : false;
         var keepTypingFocus=$(".ui-settings-keeptypingfocus:checked").length>0 ? true : false;
         var tabsOnTheSide=$(".ui-settings-tabsontheside:checked").length>0 ? true : false;
-        var highlightWords=$(".ui-settings-highlightwords").val().split(",  ");
+        var highlightWords=$(".ui-settings-highlightwords").val().split(",");
         var flashTabIndicate=$(".ui-settings-flashTabIndicate:checked").length>0 ? true : false;
         if(highlightWords[0]==="") highlightWords=[];
         FList.Chat.Settings.current.fontSize=fontSize;
