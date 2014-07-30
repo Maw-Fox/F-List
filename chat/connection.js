@@ -37,7 +37,7 @@ FList.Connection = {
         FList.Chat.identity="";
         //loop through all channeltabs,set joined to false.
         FList.Chat.channels.list=[];
-        FList.Chat.TabBar.saveTabs();//Save the tabs' pinned status. Above kind of seems a little redundant. ~Kali
+        FList.Chat.TabBar.saveTabs();
         for(var key in FList.Chat.TabBar.list) {
             var tab=FList.Chat.TabBar.list[key];
             if(!tab.closed && tab.type!=="console" && !tab.pinned){

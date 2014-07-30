@@ -221,7 +221,7 @@
                         matchCount = matcherString.match(regx);
                     }
 
-                    if (!matchcount && paramfmt.length === 1) {
+                    if (!matchCount && paramfmt.length === 1) {
                         return fail('User is not currently online or does not exist. ' +
                                         '(No partial/full matches for: \'' + lineStore + '\')');
                     }

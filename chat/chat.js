@@ -879,7 +879,7 @@ FList.Chat.TabBar = new function TabBar() {
     this.loadSavedTabs = function() {
         var userString = FList.Chat.identity.toLowerCase().replace(/ /g,"_"),
             saveString = localStorage["tabs_" + userString],
-            saveData = JSON.parse(saveString);
+            saveData = (saveString) ? JSON.parse(saveString): undefined;
 
         if (typeof Storage !== "undefined" && saveString === undefined) {
             localStorage["tabs_" + userString] = FList.Common_getCookie(
@@ -896,18 +896,20 @@ FList.Chat.TabBar = new function TabBar() {
         if (!FList.Chat.restoreTabs.length && saveData) {
             $.each(saveData,
                 function(i, curTab) {
-                    var chan,
-                        local = FList.Chat.TabBar,
-                        tabObj = local.getTabFromId(
-                            curTab.type, curTab.id
-                        ).tab,
-                        isPinned = local.getTabFromElement(tabObj).pinned;
+                    var local = FList.Chat.TabBar,
+                        chan,
+                        tabObj,
+                        isPinned;
 
-                    if (curTab.type === "channel") {
-                        FList.Chat.openChannelChat(curTab.id, false)
-                    } else if (curTab.type === "user") {
+                    if (curTab.type === 'channel')
+                        FList.Chat.openChannelChat(curTab.id, false);
+
+                    if (curTab.type === 'user')
                         FList.Chat.openPrivateChat(curTab.title, false);
-                    }
+
+                    tabObj = local.getTabFromId(curTab.type, curTab.id).tab;
+
+                    isPinned = local.getTabFromElement(tabObj).pinned;
 
                     if (isPinned) {
                         tabObj.children(".pin")
@@ -919,6 +921,7 @@ FList.Chat.TabBar = new function TabBar() {
         } else {
             $.each(FList.Chat.restoreTabs,
                 function(i, curTab) {
+                    console.log(curTab, 'restore');
                     if (curTab.type === "channel") {
                         FList.Chat.openChannelChat(curTab.id, false)
                     } else if (curTab.type === "user") {
@@ -1734,20 +1737,25 @@ FList.Chat.staffAlert = {
  */
 (function (local) {
     var WEEK = 604800000,
-        curObj; // milliseconds in a week
+        curObj,
+        LS_KEYS = Object.keys(localStorage);
 
-    for (var cur in localStorage) {
-        if (cur.indexOf(local.identity) === 0) {
-            if (localStorage[cur].charAt(0) !== '{') {
-                delete localStorage[cur];
-            } else {
-                curObj = JSON.parse(localStorage[cur]);
+    if (window.Storage) {
+        $.each(localStorage, function (cur) {
+            cur = ls_keys[cur];
 
-                if (new Date().getTime() - curObj.last > WEEK) {
+            if (cur.indexOf(local.identity) === 0) {
+                if (localStorage[cur].charAt(0) !== '{') {
                     delete localStorage[cur];
+                } else {
+                    curObj = JSON.parse(localStorage[cur]);
+
+                    if (new Date().getTime() - curObj.last > WEEK) {
+                        delete localStorage[cur];
+                    }
                 }
             }
-        }
+        });
     }
 }(FList.Chat));
 
@@ -1899,7 +1907,7 @@ FList.Chat.Logs = (function (local) {
             for (var i = 0; i < bufferLimit; i++) {
                 curMsg = lsData.logs[i];
 
-                TARGET_TAB.logs.push({
+                TARGET_TAB.logs.unshift({
                     type: curMsg.kind,
                     by: curMsg.user,
                     html: buildMessage(
