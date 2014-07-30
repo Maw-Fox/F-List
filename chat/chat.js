@@ -882,11 +882,8 @@ FList.Chat.TabBar = new function TabBar() {
             saveData = (saveString) ? JSON.parse(saveString): undefined;
 
         if (typeof Storage !== "undefined" && saveString === undefined) {
-            localStorage["tabs_" + userString] = FList.Common_getCookie(
-                "tabs_" + userString
-            );
-            saveString = localStorage["tabs_" + userString];
-            saveData = JSON.parse(saveString);
+            localStorage['tabs_' + userString] = '[]';
+            saveData = [];
         }
 
         if (!saveString && !FList.Chat.restoreTabs.length) {
