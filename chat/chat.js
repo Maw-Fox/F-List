@@ -1742,7 +1742,7 @@ FList.Chat.staffAlert = {
 
     if (window.Storage) {
         $.each(localStorage, function (cur) {
-            cur = ls_keys[cur];
+            cur = LS_KEYS[cur];
 
             if (cur.indexOf(local.identity) === 0) {
                 if (localStorage[cur].charAt(0) !== '{') {
