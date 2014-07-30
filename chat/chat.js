@@ -504,19 +504,10 @@ FList.Chat.Search = {
 
 };
 
-FList.Chat.isChatop = function(){
-    if(jQuery.inArray(FList.Chat.identity,FList.Chat.opList)!==-1) return true;
-    else return false;
-};
+FList.Chat.isChatop = function (user) {
+    user = (!user) ? FList.Chat.identity.toLowerCase(): user.toLowerCase();
 
-FList.Chat.isChatop = function(user){
-    if(user===undefined) user = FList.Chat.identity;
-    var result = false;
-    $.each(FList.Chat.opList, function(index, value) {
-        if (result === false && value.toLowerCase() === user.toLowerCase())
-            result = true;
-    });
-    return result;
+    return FList.Chat.opList.indexOf(user) !== -1;
 };
 
 FList.Chat.isSubscribed = function(){
@@ -524,11 +515,15 @@ FList.Chat.isSubscribed = function(){
 };
 
 FList.Chat.isChanop = function(channel, user) {
-    if(user===undefined) user = FList.Chat.identity;
     var tab = FList.Chat.TabBar.getTabFromId("channel", channel);
+
+    user = (!user) ? FList.Chat.identity.toLowerCase(): user.toLowerCase();
+
     if (tab.type !== "channel") return false;
-    if (FList.Chat.isChatop()) return true;
-    return (jQuery.inArray(FList.Chat.identity,FList.Chat.channels.getData(tab.id).oplist) !== -1);
+
+    if (FList.Chat.isChatop(user)) return true;
+
+    return (jQuery.inArray(user, FList.Chat.channels.getData(tab.id).oplist) !== -1);
 };
 
 FList.Chat.isChanOwner = function() {
